@@ -12,7 +12,7 @@ dotenv.config();
 
 /* App Variables */
 createConnection()
-	.then((connection) => {
+	.then(() => {
 		debugDB('connection is success');
 	})
 	.catch((err) => debugERROR(err));
