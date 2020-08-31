@@ -1,10 +1,9 @@
 import app from './index';
-import debug from 'debug';
+import { debugHTTP } from './utils/debug';
 
-const httpDebug = debug('http');
 /* Server Activation */
 const server = app.listen(app.get('port'), () => {
-	httpDebug(`server listening on PORT ${app.get('port')}`);
+	debugHTTP(`server listening on PORT ${app.get('port')}`);
 });
 
 export default server;
