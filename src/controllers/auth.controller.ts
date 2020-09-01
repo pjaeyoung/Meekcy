@@ -6,13 +6,14 @@ import configs from '../common/config';
 import { JWTCreationOption } from '../interfaces/Auth.interface';
 import jwt from 'jsonwebtoken';
 
-const client = new OAuth2Client(configs.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client();
 
 // token 검증 및 user정보 반환
 const verifyTokenAndGetUserInfo = async (idToken: string): Promise<TokenPayload | undefined> => {
 	try {
 		const ticket: LoginTicket = await client.verifyIdToken({
 			idToken,
+			audience: configs.GOOGLE_CLIENT_ID,
 		});
 		return ticket.getPayload();
 	} catch (err) {
@@ -56,10 +57,6 @@ export const authController = {
 			res.status(statusCode).json({ token });
 		} catch (err) {
 			debugERROR(err);
-			if (err.name === 'TokenVerificationError') {
-				res.sendStatus(500);
-				return;
-			}
 			res.status(404).send(err.message);
 		}
 	},
