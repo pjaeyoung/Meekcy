@@ -11,7 +11,7 @@ import { authRouter } from './routes/auth.route';
 import configs from './common/config';
 
 /* App Variables */
-createConnection()
+createConnection(configs.NODE_ENV === 'test' ? 'test' : 'default')
 	.then(() => {
 		debugDB('connection is success');
 	})
