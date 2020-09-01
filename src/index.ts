@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(morgan('combined', { stream: { write: (msg) => debugHTTP(msg) } }));
 app.use(cors(corsOptions));
 
-app.use(authRouter);
+app.use('/auth', authRouter);
 app.use(
 	expressJWT({
 		secret: `${process.env.JWT_SECRET}`,
