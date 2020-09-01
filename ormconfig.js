@@ -6,7 +6,7 @@ module.exports = {
 	password: process.env.DB_PASSWORD,
 	database: process.env.DB_NAME,
 	synchronize: true,
-	logging: ['query', 'error'],
+	logging: ['error'],
 	entities: ['dist/**/*.entity.js'],
 	migrations: ['dist/**/*.migration.js'],
 	subscribers: ['dist/**/*.subscriber.js'],
