@@ -6,4 +6,5 @@ export default {
 	GOOGLE_CLIENT_ID: `${process.env.GOOGLE_CLIENT_ID}`,
 	SALT: `${process.env.SALT}`,
 	JWT_SECRET: `${process.env.JWT_SECRET}`,
+	CLIENT_IP: [`${process.env.CLIENT1}`, `${process.env.CLIENT2}`],
 };

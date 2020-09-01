@@ -4,13 +4,11 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import compression from 'compression';
-import * as dotenv from 'dotenv';
 import { createConnection } from 'typeorm';
 import expressJWT from 'express-jwt';
 import { debugHTTP, debugDB, debugERROR } from './utils/debug';
 import { authRouter } from './routes/auth.route';
-
-dotenv.config();
+import configs from './common/config';
 
 /* App Variables */
 createConnection()
@@ -19,9 +17,8 @@ createConnection()
 	})
 	.catch((err) => debugERROR(err));
 
-const CLEINT_IP: string = process.env.CLEINT_IP || 'http://localhost:3000';
 const corsOptions: cors.CorsOptions = {
-	origin: [CLEINT_IP],
+	origin: configs.CLIENT_IP,
 	methods: ['GET', 'POST', 'PATCH'],
 	credentials: true,
 };
