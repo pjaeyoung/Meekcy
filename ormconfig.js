@@ -1,16 +1,36 @@
-module.exports = {
-	type: 'mysql',
-	host: process.env.DB_HOST,
-	port: process.env.DB_PORT,
-	username: process.env.DB_USERNAME,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
-	synchronize: true,
-	logging: ['error'],
-	entities: ['dist/**/*.entity.js'],
-	migrations: ['dist/**/*.migration.js'],
-	subscribers: ['dist/**/*.subscriber.js'],
-	cli: {
-		migrationsDir: 'src/migrations',
+module.exports = [
+	{
+		name: 'default',
+		type: 'mysql',
+		host: process.env.DB_HOST,
+		port: process.env.DB_PORT,
+		username: process.env.DB_USERNAME,
+		password: process.env.DB_PASSWORD,
+		database: process.env.DB_NAME,
+		synchronize: true,
+		logging: ['error'],
+		entities: ['dist/**/*.entity.js'],
+		migrations: ['dist/**/*.migration.js'],
+		subscribers: ['dist/**/*.subscriber.js'],
+		cli: {
+			migrationsDir: 'src/migrations',
+		},
 	},
-};
+	{
+		name: 'test',
+		type: 'mysql',
+		host: process.env.DB_HOST,
+		port: process.env.DB_PORT,
+		username: process.env.DB_USERNAME,
+		password: process.env.DB_PASSWORD,
+		database: 'meekcy_test',
+		synchronize: true,
+		logging: ['error'],
+		entities: ['dist/**/*.entity.js'],
+		migrations: ['dist/**/*.migration.js'],
+		subscribers: ['dist/**/*.subscriber.js'],
+		cli: {
+			migrationsDir: 'src/migrations',
+		},
+	},
+];

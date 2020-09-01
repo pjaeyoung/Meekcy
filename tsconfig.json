@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"lib": ["ES5", "ES6"],
+		"lib": ["ES5", "ES6", "DOM"],
 		"target": "es2015",
 		"module": "commonjs",
 		"moduleResolution": "node",
@@ -12,5 +12,5 @@
 		"sourceMap": true
 	},
 	"include": ["src/**/*"],
-	"exclude": ["node_modules", "**/*.spec.js"]
+	"exclude": ["node_modules", "__test__/*.spec.js"]
 }
