@@ -33,6 +33,6 @@ export class Message extends BaseEntity {
 	user!: User;
 
 	@ManyToOne((type) => Room, (room) => room.messages, { nullable: false, onDelete: 'CASCADE' })
-	@JoinColumn({ name: 'room_id' })
+	@JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
 	room!: Room;
 }
