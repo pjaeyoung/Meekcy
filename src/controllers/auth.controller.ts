@@ -48,7 +48,7 @@ export const authController = {
 			const token = createJWT({
 				userId: user.id,
 				nickname: user.nickname,
-				avatar: 'example.com/avatar.jpg',
+				avatar: user.avatar.url,
 			});
 
 			// 클라이언트에 token 전달

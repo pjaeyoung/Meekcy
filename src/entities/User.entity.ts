@@ -47,13 +47,19 @@ export class User extends BaseEntity {
 		let created = false; // 새로 생성여부
 		let user;
 		try {
-			// avatar join하여 가져오기
-			user = await User.findOne(where);
+			// avatar relation 적용하여 가져오기
+			user = await User.findOne(where, { relations: ['avatar'] });
 			if (user === undefined) {
+				// DB에서 avatar 가져오기
+				const avatar = await Avatar.findOne({ id: 1 });
+				if (avatar === undefined) {
+					throw Error('AvatarID 1 is not found');
+				}
 				// DB에 user record 생성하기
 				user = new User();
 				user.nickname = nickname || '';
 				user.snsId = snsId;
+				user.avatar = avatar;
 				user = await user.save();
 				created = true;
 			}
