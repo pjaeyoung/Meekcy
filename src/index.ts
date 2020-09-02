@@ -7,8 +7,9 @@ import compression from 'compression';
 import { createConnection } from 'typeorm';
 import expressJWT from 'express-jwt';
 import { debugHTTP, debugDB, debugERROR } from './utils/debug';
-import { authRouter } from './routes/auth.route';
 import configs from './common/config';
+import { authRouter } from './routes/auth.route';
+import { avatarRouter } from './routes/avatar.route';
 
 /* App Variables */
 createConnection(configs.NODE_ENV === 'test' ? 'test' : 'default')
@@ -39,6 +40,7 @@ app.use(
 		algorithms: ['HS256'],
 	}),
 );
+app.use('/avatars', avatarRouter);
 
 // not found handling
 app.use((req: Request, res: Response) => {
@@ -46,11 +48,8 @@ app.use((req: Request, res: Response) => {
 });
 // error handling
 app.use((err: Error, req: Request, res: Response) => {
-	if (err.name === 'UnauthorizedError') {
-		res.status(401).send(err);
-	} else {
-		res.sendStatus(500);
-	}
+	debugERROR(err);
+	res.sendStatus(500);
 });
 
 export default app;

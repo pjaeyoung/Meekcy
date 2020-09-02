@@ -28,7 +28,7 @@ const createJWT = (option: JWTCreationOption): string => {
 	return jwt.sign(option, configs.JWT_SECRET, { expiresIn: 129600 });
 };
 
-export const authController = {
+export default {
 	post: async (req: Request, res: Response): Promise<void> => {
 		const { id_token } = req.body;
 		try {

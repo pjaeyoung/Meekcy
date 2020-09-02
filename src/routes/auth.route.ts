@@ -1,6 +1,6 @@
 /* Required External Modules*/
 import express from 'express';
-import { authController } from '../controllers/auth.controller';
+import authController from '../controllers/auth.controller';
 
 /* Router Definition */
 export const authRouter = express.Router();
