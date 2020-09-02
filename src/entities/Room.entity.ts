@@ -10,8 +10,9 @@ import {
 import { User } from './User.entity';
 import { Message } from './Message.entity';
 import { Video } from './Video.entity';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class Room extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;
