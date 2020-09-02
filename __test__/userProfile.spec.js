@@ -8,22 +8,21 @@ const URL = 'http://localhost:4000';
 
 const { token } = require('./fixtures/token.json');
 
-describe('Avatar API Test', () => {
+describe('User Profile API Test', () => {
 	describe('Best Case', () => {
-		it('token 인증이 성공되었으면 DB에 있는 모든 avatar 정보를 가져와야합니다.', (done) => {
+		it('token 인증이 성공되었으면 DB에 유저 정보가 업데이트되어야 합니다.', (done) => {
 			chai
 				.request(URL)
-				.get('/avatars')
+				.patch('/user/profile')
 				.set({
 					Authorization: `Bearer ${token}`,
 				})
+				.send({
+					avatar_id: 1,
+				})
 				.then((res) => {
 					expect(res).to.have.status(200);
-					expect(Array.isArray(res.body)).to.equal(true);
-					expect(res.body.length).to.equal(7);
-					for (let i = 0; i < res.body.length; i += 1) {
-						expect(res.body[i]).has.all.keys(['id', 'name', 'url']);
-					}
+					expect(res.text).to.equal('Success');
 					done();
 				})
 				.catch((err) => done(err));
@@ -33,11 +32,29 @@ describe('Avatar API Test', () => {
 		it('token을 decode한 결과 user 정보가 없으면 Unauthorized 응답을 해야합니다.', (done) => {
 			chai
 				.request(URL)
-				.get('/avatars')
+				.patch('/user/profile')
 				.set({ Authorization: `Bearer thisisfaketoken` })
+				.send({
+					avatar_id: 1,
+				})
 				.then((res) => {
 					expect(res).to.have.status(401);
 					expect(res.res.statusMessage).to.equal('Unauthorized');
+					done();
+				})
+				.catch((err) => done(err));
+		});
+		it('요청한 Avatar Id가 DB에 존재하지 않으면 NOT FOUND 응답을 해야합니다.', (done) => {
+			chai
+				.request(URL)
+				.patch('/user/profile')
+				.set({ Authorization: `Bearer ${token}` })
+				.send({
+					avatar_id: 100,
+				})
+				.then((res) => {
+					expect(res).to.have.status(404);
+					expect(res.text).to.equal('unvalid avatar id');
 					done();
 				})
 				.catch((err) => done(err));
