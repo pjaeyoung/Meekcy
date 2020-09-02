@@ -9,8 +9,9 @@ import {
 } from 'typeorm';
 import { User } from './User.entity';
 import { Video } from './Video.entity';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class VideoHistory extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;

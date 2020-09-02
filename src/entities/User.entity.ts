@@ -12,8 +12,9 @@ import { Room } from './Room.entity';
 import { Message } from './Message.entity';
 import { VideoHistory } from './VideoHistory.entity';
 import { FindUserCondition } from '../interfaces/User.interface';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;

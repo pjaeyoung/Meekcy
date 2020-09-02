@@ -11,7 +11,7 @@ import configs from './common/config';
 import router from './routes/index.route';
 
 /* App Variables */
-createConnection(configs.NODE_ENV === 'test' ? 'test' : 'default')
+createConnection()
 	.then(() => {
 		debugDB('connection is success');
 	})

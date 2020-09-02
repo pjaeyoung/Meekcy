@@ -10,8 +10,9 @@ import {
 } from 'typeorm';
 import { User } from './User.entity';
 import { Room } from './Room.entity';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class Message extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;

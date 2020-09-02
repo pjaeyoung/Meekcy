@@ -1,8 +1,9 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Room } from './Room.entity';
 import { VideoHistory } from './VideoHistory.entity';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class Video extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;

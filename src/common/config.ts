@@ -7,5 +7,5 @@ export default {
 	SALT: `${process.env.SALT}`,
 	JWT_SECRET: `${process.env.JWT_SECRET}`,
 	CLIENT_IP: [`${process.env.CLIENT1}`, `${process.env.CLIENT2}`],
-	NODE_ENV: `${process.env.NODE_ENV}`,
+	DB_NAME: process.env.NODE_ENV === 'test' ? 'meekcy_test' : `${process.env.DB_NAME}`,
 };
