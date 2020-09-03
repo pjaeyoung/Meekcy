@@ -1,10 +1,10 @@
-import { Response } from 'express';
+import { Response, NextFunction } from 'express';
 import { JWTRequest } from '../interfaces/Auth.interface';
 import { User } from '../entities/User.entity';
 import { debugERROR } from '../utils/debug';
 
 export default {
-	patch: async (req: JWTRequest, res: Response): Promise<void> => {
+	patch: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
 		try {
 			const {
 				user,
@@ -22,9 +22,12 @@ export default {
 				.execute();
 			res.status(200).send('Success');
 		} catch (err) {
-			debugERROR(err);
-			// avatar_id가 DB에 존재하지 않을 경우
-			res.status(404).send('unvalid avatar id');
+			debugERROR(err.name);
+			if (err.message === 'RequestError' || err.name === 'QueryFailedError') {
+				res.status(404).send('unvalid avatar_id');
+			} else {
+				next(err);
+			}
 		}
 	},
 };

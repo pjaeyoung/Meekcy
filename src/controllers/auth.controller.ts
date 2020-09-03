@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client, LoginTicket, TokenPayload } from 'google-auth-library';
 import { User } from '../entities/User.entity';
 import { debugERROR } from '../utils/debug';
@@ -29,7 +29,7 @@ const createJWT = (option: JWTCreationOption): string => {
 };
 
 export default {
-	post: async (req: Request, res: Response): Promise<void> => {
+	post: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		try {
 			const { id_token } = req.body;
 
@@ -61,8 +61,11 @@ export default {
 			const statusCode = created ? 201 : 200;
 			res.status(statusCode).json({ token });
 		} catch (err) {
-			debugERROR(err);
-			res.status(404).send(err.message);
+			if (err.message === 'RequestError' || err.name === 'QueryFailedError') {
+				res.status(404).send('unvalid token_id');
+			} else {
+				next(err);
+			}
 		}
 	},
 };
