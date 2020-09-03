@@ -5,9 +5,10 @@
 	"main": "dist/server.js",
 	"scripts": {
 		"typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
-		"start": "export NODE_ENV=development && DEBUG=* tsc-watch --onSuccess \"node ./dist/server.js\"",
+		"migration": "ts-node typeorm migration:run",
+		"start": "cross-env NODE_ENV=development DEBUG=* tsc-watch --onSuccess \"node ./dist/server.js\"",
 		"debug": "DEBUG=* tsc-watch --onSuccess \"node --inspect-brk ./dist/server.js\"",
-		"test": "export NODE_ENV=test && mocha __test__/*.spec.js"
+		"test": "cross-env NODE_ENV=test mocha __test__/*.spec.js"
 	},
 	"repository": {
 		"type": "git",
@@ -48,6 +49,7 @@
 		"@types/jsonwebtoken": "^8.5.0",
 		"compression": "^1.7.4",
 		"cors": "^2.8.5",
+		"cross-env": "^7.0.2",
 		"env": "0.0.2",
 		"express": "^4.17.1",
 		"express-jwt": "^6.0.0",

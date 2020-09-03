@@ -8,9 +8,8 @@ module.exports = [
 		database: process.env.NODE_ENV === 'test' ? 'meekcy_test' : process.env.DB_NAME,
 		synchronize: true,
 		logging: ['error'],
-		entities: ['dist/**/*.entity.js'],
-		migrations: ['dist/**/*.migration.js'],
-		subscribers: ['dist/**/*.subscriber.js'],
+		entities: ['dist/entities/*.js'],
+		migrations: ['dist/migrations/*.js'],
 		cli: {
 			migrationsDir: 'src/migrations',
 		},
