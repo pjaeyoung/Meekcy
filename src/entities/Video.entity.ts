@@ -9,6 +9,9 @@ export class Video extends BaseEntity {
 	id!: number;
 
 	@Column()
+	title!: string;
+
+	@Column()
 	thumbnail!: string;
 
 	@Column({ name: 'running_time' })

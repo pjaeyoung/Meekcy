@@ -25,7 +25,7 @@ const corsOptions: cors.CorsOptions = {
 const PORT: number = Number(process.env.PORT) || 4000;
 const app: express.Application = express();
 
-const { authRouter, avatarRouter, userRouter } = router;
+const { authRouter, avatarRouter, userRouter, videoRouter } = router;
 
 /* App Configuration */
 app.set('port', PORT);
@@ -43,6 +43,7 @@ app.use(
 );
 app.use('/avatars', avatarRouter);
 app.use('/user', userRouter);
+app.use('/videos', videoRouter);
 
 // not found handling
 app.use((req: Request, res: Response) => {
