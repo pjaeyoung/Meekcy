@@ -5,12 +5,15 @@ import { debugERROR } from '../utils/debug';
 
 export default {
 	patch: async (req: JWTRequest, res: Response): Promise<void> => {
-		const {
-			user,
-			body: { avatar_id: avatar },
-		} = req;
-
 		try {
+			const {
+				user,
+				body: { avatar_id: avatar },
+			} = req;
+			if (avatar === undefined) {
+				throw Error('RequestError');
+			}
+
 			// userId에 해당하는 user record의 avatar 변경사항 적용
 			await User.createQueryBuilder()
 				.update()

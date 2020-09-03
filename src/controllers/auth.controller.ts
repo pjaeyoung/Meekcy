@@ -30,8 +30,13 @@ const createJWT = (option: JWTCreationOption): string => {
 
 export default {
 	post: async (req: Request, res: Response): Promise<void> => {
-		const { id_token } = req.body;
 		try {
+			const { id_token } = req.body;
+
+			if (id_token === undefined) {
+				throw Error('RequestError');
+			}
+
 			// id_token 검증 및 유저 정보 가져오기
 			const payload = await verifyTokenAndGetUserInfo(id_token);
 			if (payload === undefined) {
