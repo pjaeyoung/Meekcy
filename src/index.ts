@@ -25,7 +25,7 @@ const corsOptions: cors.CorsOptions = {
 const PORT: number = Number(process.env.PORT) || 4000;
 const app: express.Application = express();
 
-const { authRouter, avatarRouter, userRouter, videoRouter } = router;
+const { authRouter, avatarRouter, userRouter, videoRouter, roomRouter } = router;
 
 /* App Configuration */
 app.set('port', PORT);
@@ -35,15 +35,39 @@ app.use(morgan('combined', { stream: { write: (msg) => debugHTTP(msg) } }));
 app.use(cors(corsOptions));
 
 app.use('/auth', authRouter);
+
 app.use(
+	'/avatars',
 	expressJWT({
 		secret: `${process.env.JWT_SECRET}`,
 		algorithms: ['HS256'],
 	}),
+	avatarRouter,
 );
-app.use('/avatars', avatarRouter);
-app.use('/user', userRouter);
-app.use('/videos', videoRouter);
+app.use(
+	'/user',
+	expressJWT({
+		secret: `${process.env.JWT_SECRET}`,
+		algorithms: ['HS256'],
+	}),
+	userRouter,
+);
+app.use(
+	'/videos',
+	expressJWT({
+		secret: `${process.env.JWT_SECRET}`,
+		algorithms: ['HS256'],
+	}),
+	videoRouter,
+);
+app.use(
+	'/rooms',
+	expressJWT({
+		secret: `${process.env.JWT_SECRET}`,
+		algorithms: ['HS256'],
+	}),
+	roomRouter,
+);
 
 // not found handling
 app.use((req: Request, res: Response) => {

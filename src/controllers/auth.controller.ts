@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client, LoginTicket, TokenPayload } from 'google-auth-library';
 import { User } from '../entities/User.entity';
 import { debugERROR } from '../utils/debug';
@@ -29,9 +29,14 @@ const createJWT = (option: JWTCreationOption): string => {
 };
 
 export default {
-	post: async (req: Request, res: Response): Promise<void> => {
-		const { id_token } = req.body;
+	post: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		try {
+			const { id_token } = req.body;
+
+			if (id_token === undefined) {
+				throw Error('RequestError');
+			}
+
 			// id_token 검증 및 유저 정보 가져오기
 			const payload = await verifyTokenAndGetUserInfo(id_token);
 			if (payload === undefined) {
@@ -57,7 +62,11 @@ export default {
 			res.status(statusCode).json({ token });
 		} catch (err) {
 			debugERROR(err);
-			res.status(404).send(err.message);
+			if (err.message === 'RequestError' || err.name === 'QueryFailedError') {
+				res.status(404).send('unvalid token_id');
+			} else {
+				next(err);
+			}
 		}
 	},
 };

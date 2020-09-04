@@ -13,9 +13,8 @@ export default {
 		}
 	},
 	getWatched: async (req: JWTRequest, res: Response, next: NextFunction) => {
-		const { user } = req;
-
 		try {
+			const { user } = req;
 			const videos = await VideoHistory.createQueryBuilder('history')
 				.select('history.endTime')
 				.leftJoin('history.user', 'user')
