@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-interface token {
+export interface Token {
 	avatar: string;
 	exp: number;
 	iat: number;
@@ -15,5 +15,5 @@ export interface JWTCreationOption {
 }
 
 export interface JWTRequest extends Request {
-	user?: token;
+	user?: Token;
 }

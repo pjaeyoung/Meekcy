@@ -24,7 +24,7 @@ export default {
 		} catch (err) {
 			debugERROR(err.name);
 			if (err.message === 'RequestError' || err.name === 'QueryFailedError') {
-				res.status(404).send('unvalid avatar_id');
+				res.status(404).send('unvalid avatar id');
 			} else {
 				next(err);
 			}

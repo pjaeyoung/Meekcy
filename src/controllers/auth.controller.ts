@@ -61,6 +61,7 @@ export default {
 			const statusCode = created ? 201 : 200;
 			res.status(statusCode).json({ token });
 		} catch (err) {
+			debugERROR(err);
 			if (err.message === 'RequestError' || err.name === 'QueryFailedError') {
 				res.status(404).send('unvalid token_id');
 			} else {
