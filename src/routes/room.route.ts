@@ -9,3 +9,6 @@ export const roomRouter = express.Router();
 
 // POST /rooms
 roomRouter.post('/', roomController.post);
+
+// GET /rooms/:roomname
+roomRouter.get('/:roomname', roomController.get);

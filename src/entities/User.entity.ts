@@ -22,7 +22,7 @@ export class User extends BaseEntity {
 	@Column()
 	nickname!: string;
 
-	@Column({ name: 'sns_id' })
+	@Column({ name: 'sns_id', select: false })
 	snsId!: string;
 
 	@ManyToOne((type) => Avatar, (avatar) => avatar.users, { onDelete: 'SET NULL' })

@@ -7,7 +7,7 @@ export class Avatar extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	@Column()
+	@Column({ select: false })
 	name!: string;
 
 	@Column()
