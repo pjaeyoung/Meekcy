@@ -17,8 +17,8 @@ export default {
 			const { user } = req;
 			const videos = await VideoHistory.createQueryBuilder('history')
 				.select('history.endTime')
-				.leftJoin('history.user', 'user')
-				.leftJoinAndSelect('history.video', 'video')
+				.innerJoin('history.user', 'user')
+				.innerJoinAndSelect('history.video', 'video')
 				.where('history.user_id = :userId', { userId: user?.userId })
 				.getMany();
 			res.json(videos);

@@ -22,7 +22,7 @@ describe('Avatar API Test', () => {
 					expect(Array.isArray(res.body)).to.equal(true);
 					expect(res.body.length).to.equal(7);
 					for (let i = 0; i < res.body.length; i += 1) {
-						expect(res.body[i]).has.all.keys(['id', 'name', 'url']);
+						expect(res.body[i]).has.all.keys(['id', 'url']);
 					}
 					done();
 				})
