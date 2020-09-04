@@ -21,6 +21,9 @@ export class Video extends BaseEntity {
 	releaseDay!: string;
 
 	@Column()
+	detail!: string;
+
+	@Column()
 	url!: string;
 
 	@OneToMany((type) => Room, (room) => room.video)
