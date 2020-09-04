@@ -17,6 +17,9 @@ export class Video extends BaseEntity {
 	@Column({ name: 'running_time' })
 	runningTime!: number;
 
+	@Column({ name: 'release_day' })
+	releaseDay!: string;
+
 	@Column()
 	url!: string;
 

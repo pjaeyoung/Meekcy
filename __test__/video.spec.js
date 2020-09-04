@@ -20,7 +20,14 @@ describe('Video API test', () => {
 						expect(res).to.have.status(200);
 						expect(Array.isArray(res.body)).to.be.true;
 						for (let i = 0; i < res.body.length; i += 1) {
-							expect(res.body[i]).has.all.keys(['id', 'title', 'thumbnail', 'runningTime', 'url']);
+							expect(res.body[i]).has.all.keys([
+								'id',
+								'title',
+								'thumbnail',
+								'runningTime',
+								'releaseDay',
+								'url',
+							]);
 						}
 						done();
 					})
@@ -59,6 +66,7 @@ describe('Video API test', () => {
 								'title',
 								'thumbnail',
 								'runningTime',
+								'releaseDay',
 								'url',
 							]);
 						}
