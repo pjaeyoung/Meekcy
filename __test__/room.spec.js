@@ -2,11 +2,10 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+
 const expect = chai.expect;
 chai.use(chaiHttp);
 const URL = 'http://localhost:4000';
-
-const { token } = require('./fixtures/token.json');
 
 describe('Room API Test', () => {
 	describe('GET /rooms/:roomname', () => {
@@ -14,17 +13,22 @@ describe('Room API Test', () => {
 			it('token 인증이 성공되었으면 DB에 Room정보(video,user,messages)를 전달해야합니다.', (done) => {
 				chai
 					.request(URL)
-					.get('/rooms/14d7bebb-963c-421e-9bd4-9e8ef6c97525')
+					.get('/rooms/06b45755-2533-482f-8c68-eeb5d5bc67c4')
 					.set({
-						Authorization: `Bearer ${token}`,
+						Authorization: `Bearer ${global.token}`,
 					})
 					.then((res) => {
+						console.log(res);
 						expect(res).to.have.status(200);
 						expect(res.body).has.all.keys(['video', 'user', 'messages']);
 						expect(res.body.video).has.all.keys(['title', 'url']);
-						expect(res.body.user).has.all.keys(['userId', 'nickname', 'avatar']);
+						expect(res.body.user).has.all.keys(['id', 'nickname', 'avatar']);
 						expect(Array.isArray(res.body.messages)).to.be.true;
 
+						if (res.body.messages.length === 0) {
+							done();
+							return;
+						}
 						const message = res.body.messages[0];
 						expect(message).has.all.keys(['id', 'text', 'caption', 'user']);
 						done();
@@ -36,7 +40,7 @@ describe('Room API Test', () => {
 			it('token을 decode한 결과 user 정보가 없으면 Unauthorized 응답을 해야합니다.', (done) => {
 				chai
 					.request(URL)
-					.get('/rooms/14d7bebb-963c-421e-9bd4-9e8ef6c97525')
+					.get('/rooms/06b45755-2533-482f-8c68-eeb5d5bc67c4')
 					.set({ Authorization: `Bearer thisisfaketoken` })
 					.then((res) => {
 						expect(res).to.have.status(401);
@@ -49,7 +53,7 @@ describe('Room API Test', () => {
 				chai
 					.request(URL)
 					.get('/rooms/fakeroomname')
-					.set({ Authorization: `Bearer ${token}` })
+					.set({ Authorization: `Bearer ${global.token}` })
 					.then((res) => {
 						expect(res).to.have.status(404);
 						expect(res.text).to.equal('RequestError: roomname');
@@ -66,7 +70,7 @@ describe('Room API Test', () => {
 					.request(URL)
 					.post('/rooms')
 					.set({
-						Authorization: `Bearer ${token}`,
+						Authorization: `Bearer ${global.token}`,
 					})
 					.send({ video_id: 1, end_time: 0 })
 					.then((res) => {
@@ -97,7 +101,7 @@ describe('Room API Test', () => {
 				chai
 					.request(URL)
 					.post('/rooms')
-					.set({ Authorization: `Bearer ${token}` })
+					.set({ Authorization: `Bearer ${global.token}` })
 					.send({ video_id: -1, end_time: 0 })
 					.then((res) => {
 						expect(res).to.have.status(404);
@@ -110,7 +114,7 @@ describe('Room API Test', () => {
 				chai
 					.request(URL)
 					.post('/rooms')
-					.set({ Authorization: `Bearer ${token}` })
+					.set({ Authorization: `Bearer ${global.token}` })
 					.send({ video_id: 100 })
 					.then((res) => {
 						expect(res).to.have.status(404);
