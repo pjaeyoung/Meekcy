@@ -2,11 +2,10 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+
 const expect = chai.expect;
 chai.use(chaiHttp);
 const URL = 'http://localhost:4000';
-
-const { token } = require('./fixtures/token.json');
 
 describe('User Profile API Test', () => {
 	describe('Best Case', () => {
@@ -15,14 +14,15 @@ describe('User Profile API Test', () => {
 				.request(URL)
 				.patch('/user/profile')
 				.set({
-					Authorization: `Bearer ${token}`,
+					Authorization: `Bearer ${global.token}`,
 				})
 				.send({
 					avatar_id: 1,
 				})
 				.then((res) => {
 					expect(res).to.have.status(200);
-					expect(res.text).to.equal('Success');
+					expect(res.body).has.key('token');
+					expect(typeof res.body.token).to.equal('string');
 					done();
 				})
 				.catch((err) => done(err));
@@ -48,13 +48,13 @@ describe('User Profile API Test', () => {
 			chai
 				.request(URL)
 				.patch('/user/profile')
-				.set({ Authorization: `Bearer ${token}` })
+				.set({ Authorization: `Bearer ${global.token}` })
 				.send({
-					avatar_id: 100,
+					avatar_id: -1,
 				})
 				.then((res) => {
 					expect(res).to.have.status(404);
-					expect(res.text).to.equal('unvalid avatar id');
+					expect(res.text).to.equal('RequestError: avatar_id');
 					done();
 				})
 				.catch((err) => done(err));

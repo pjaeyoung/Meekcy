@@ -19,7 +19,7 @@ export default {
 				.select('history.endTime')
 				.innerJoin('history.user', 'user')
 				.innerJoinAndSelect('history.video', 'video')
-				.where('history.user_id = :userId', { userId: user?.userId })
+				.where('history.user_id = :userId', { userId: user?.id })
 				.getMany();
 			res.json(videos);
 		} catch (err) {

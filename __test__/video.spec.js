@@ -2,11 +2,10 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+
 const expect = chai.expect;
 chai.use(chaiHttp);
 const URL = 'http://localhost:4000';
-
-const { token } = require('./fixtures/token.json');
 
 describe('Video API test', () => {
 	describe('GET /videos', () => {
@@ -15,7 +14,7 @@ describe('Video API test', () => {
 				chai
 					.request(URL)
 					.get('/videos')
-					.set({ Authorization: `Bearer ${token}` })
+					.set({ Authorization: `Bearer ${global.token}` })
 					.then((res) => {
 						expect(res).to.have.status(200);
 						expect(Array.isArray(res.body)).to.be.true;
@@ -56,7 +55,7 @@ describe('Video API test', () => {
 				chai
 					.request(URL)
 					.get('/videos/watched')
-					.set({ Authorization: `Bearer ${token}` })
+					.set({ Authorization: `Bearer ${global.token}` })
 					.then((res) => {
 						expect(res).to.have.status(200);
 						expect(Array.isArray(res.body)).to.be.true;

@@ -13,6 +13,7 @@ import { Message } from './Message.entity';
 import { VideoHistory } from './VideoHistory.entity';
 import { FindUserCondition } from '../interfaces/User.interface';
 import configs from '../common/config';
+import { debugINFO } from '../utils/debug';
 
 @Entity({ database: configs.DB_NAME })
 export class User extends BaseEntity {
@@ -38,6 +39,15 @@ export class User extends BaseEntity {
 
 	@OneToMany((type) => VideoHistory, (videoHistory) => videoHistory.user)
 	videoHistories!: VideoHistory[];
+
+	static updateProfile = async (id: number, avatar: Avatar): Promise<void> => {
+		const user = await User.findOne({ id });
+		if (user === undefined) {
+			throw Error('RequestError: user_id');
+		}
+		user.avatar = avatar;
+		await user.save();
+	};
 
 	static findOrCreate = async (condition: FindUserCondition): Promise<[User, boolean]> => {
 		const {
@@ -70,5 +80,3 @@ export class User extends BaseEntity {
 		}
 	};
 }
-
-// avatar 이미지 default값 지정해주기
