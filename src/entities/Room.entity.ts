@@ -39,7 +39,7 @@ export class Room extends BaseEntity {
 		const { user, videoId, end_time } = condition;
 		const room = new Room();
 		// DB에 유저 정보 확인
-		const userRecord = await User.findOne({ id: user.userId });
+		const userRecord = await User.findOne({ id: user.id });
 		if (userRecord === undefined) {
 			throw Error('RequestError: user_id');
 		}
