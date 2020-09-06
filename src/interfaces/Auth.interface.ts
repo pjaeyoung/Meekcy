@@ -5,13 +5,18 @@ export interface Token {
 	exp: number;
 	iat: number;
 	nickname: string;
-	userId: number;
+	id: number;
+}
+
+interface JWTCreationPayload {
+	nickname: string;
+	avatar: string;
+	id: number;
 }
 
 export interface JWTCreationOption {
-	nickname: string;
-	avatar: string;
-	userId: number;
+	payload: JWTCreationPayload;
+	expiresIn?: string;
 }
 
 export interface JWTRequest extends Request {
