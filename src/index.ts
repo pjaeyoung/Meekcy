@@ -34,13 +34,15 @@ app.use(morgan('combined', { stream: { write: (msg) => debugHTTP(msg) } }));
 app.use(cors(corsOptions));
 
 app.use('/auth', authRouter);
+
 app.use(
+	'/avatars',
 	expressJWT({
 		secret: `${process.env.JWT_SECRET}`,
 		algorithms: ['HS256'],
 	}),
+	avatarRouter,
 );
-app.use('/avatars', avatarRouter);
 
 // not found handling
 app.use((req: Request, res: Response) => {
