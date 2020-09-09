@@ -8,17 +8,15 @@ function joinUser(
 	username: string,
 	room: string,
 	avatar: string,
-) {
-	const existedUser = users.find((element) => element.userId === userId);
-	if (existedUser) {
-		existedUser.socketId = socketId;
-		return existedUser;
+): [SocketUser, boolean] {
+	let isExist = true;
+	let user = users.find((element) => element.userId === userId);
+	if (!user) {
+		user = { socketId, userId, username, room, avatar };
+		isExist = false;
+		users.push(user);
 	}
-	const user: SocketUser = { socketId, userId, username, room, avatar };
-
-	users.push(user);
-
-	return user;
+	return [user, isExist];
 }
 
 function getCurrentUserid(id: string): SocketUser | undefined {
