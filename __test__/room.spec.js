@@ -75,9 +75,7 @@ describe('Room API Test', () => {
 					.send({ video_id: 1, end_time: 0 })
 					.then((res) => {
 						expect(res).to.have.status(201);
-						expect(res.body).has.all.keys(['roomname', 'video', 'user']);
-						expect(res.body.video).has.all.keys(['title', 'url', 'end_time']);
-						expect(res.body.user).has.all.keys(['nickname', 'avatar']);
+						expect(res.body).has.key('roomname');
 						done();
 					})
 					.catch((err) => done(err));
