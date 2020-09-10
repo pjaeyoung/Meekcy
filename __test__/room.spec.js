@@ -20,17 +20,7 @@ describe('Room API Test', () => {
 					.then((res) => {
 						console.log(res);
 						expect(res).to.have.status(200);
-						expect(res.body).has.all.keys(['video', 'user', 'messages']);
-						expect(res.body.video).has.all.keys(['title', 'url']);
-						expect(res.body.user).has.all.keys(['id', 'nickname', 'avatar']);
-						expect(Array.isArray(res.body.messages)).to.be.true;
-
-						if (res.body.messages.length === 0) {
-							done();
-							return;
-						}
-						const message = res.body.messages[0];
-						expect(message).has.all.keys(['id', 'text', 'caption', 'user']);
+						expect(res.body).has.all.keys(['title', 'url_720', 'url_480', 'url_360']);
 						done();
 					})
 					.catch((err) => done(err));
