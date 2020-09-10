@@ -11,7 +11,7 @@ import { User } from './User.entity';
 import { Message } from './Message.entity';
 import { Video } from './Video.entity';
 import configs from '../common/config';
-import { RoomCreateCondition, CreatedRoom, FoundRoom } from '../interfaces/Room.interface';
+import { RoomCreateCondition, FoundRoom } from '../interfaces/Room.interface';
 import { Token } from '../interfaces/Auth.interface';
 
 @Entity({ database: configs.DB_NAME })
@@ -35,8 +35,8 @@ export class Room extends BaseEntity {
 	@JoinColumn({ name: 'video_id' })
 	video!: Video;
 
-	static createAndSave = async (condition: RoomCreateCondition): Promise<CreatedRoom> => {
-		const { user, videoId, end_time } = condition;
+	static createAndSave = async (condition: RoomCreateCondition): Promise<string> => {
+		const { user, videoId } = condition;
 		const room = new Room();
 		// DB에 유저 정보 확인
 		const userRecord = await User.findOne({ id: user.id });
@@ -56,13 +56,8 @@ export class Room extends BaseEntity {
 		// DB에 저장
 		await room.save();
 
-		// 응답으로 보낼 정보 형식 맞추기
-		const reformattedRoom = {
-			roomname: room.roomname,
-			video: { title: room.video.title, url: room.video.url, end_time },
-			user: { nickname: user.nickname, avatar: user.avatar },
-		};
-		return reformattedRoom;
+		// roomname 전달
+		return room.roomname;
 	};
 
 	static findByRoomname = async (roomname: string, userToken: Token): Promise<FoundRoom> => {

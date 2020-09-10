@@ -16,13 +16,6 @@ interface UserInRoom {
 export interface RoomCreateCondition {
 	videoId: number;
 	user: Token;
-	end_time: number;
-}
-
-export interface CreatedRoom {
-	roomname: string;
-	video: VideoInRoom;
-	user: UserInRoom;
 }
 
 export interface FoundRoom {
