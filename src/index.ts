@@ -36,38 +36,15 @@ app.use(cors(corsOptions));
 
 app.use('/auth', authRouter);
 
-app.use(
-	'/avatars',
-	expressJWT({
-		secret: `${process.env.JWT_SECRET}`,
-		algorithms: ['HS256'],
-	}),
-	avatarRouter,
-);
-app.use(
-	'/user',
-	expressJWT({
-		secret: `${process.env.JWT_SECRET}`,
-		algorithms: ['HS256'],
-	}),
-	userRouter,
-);
-app.use(
-	'/videos',
-	expressJWT({
-		secret: `${process.env.JWT_SECRET}`,
-		algorithms: ['HS256'],
-	}),
-	videoRouter,
-);
-app.use(
-	'/rooms',
-	expressJWT({
-		secret: `${process.env.JWT_SECRET}`,
-		algorithms: ['HS256'],
-	}),
-	roomRouter,
-);
+const jwtMiddleware = expressJWT({
+	secret: `${process.env.JWT_SECRET}`,
+	algorithms: ['HS256'],
+});
+
+app.use('/avatars', jwtMiddleware, avatarRouter);
+app.use('/user', jwtMiddleware, userRouter);
+app.use('/videos', jwtMiddleware, videoRouter);
+app.use('/rooms', jwtMiddleware, roomRouter);
 
 // not found handling
 app.use((req: Request, res: Response) => {
