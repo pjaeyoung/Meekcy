@@ -12,7 +12,6 @@ import { Message } from './Message.entity';
 import { Video } from './Video.entity';
 import configs from '../common/config';
 import { RoomCreateCondition, FoundRoom } from '../interfaces/Room.interface';
-import { Token } from '../interfaces/Auth.interface';
 
 @Entity({ database: configs.DB_NAME })
 export class Room extends BaseEntity {
