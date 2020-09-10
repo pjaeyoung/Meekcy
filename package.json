@@ -58,6 +58,7 @@
 		"mysql": "^2.18.1",
 		"reflect-metadata": "^0.1.13",
 		"socket.io": "^2.3.0",
+		"socketio-jwt": "^4.6.2",
 		"ts-node": "^9.0.0",
 		"typeorm": "^0.2.25"
 	}

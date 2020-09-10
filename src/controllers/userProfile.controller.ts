@@ -1,12 +1,12 @@
 import { Response, NextFunction } from 'express';
 import { JWTRequest, JWTCreationOption } from '../interfaces/Auth.interface';
 import { User } from '../entities/User.entity';
-import { debugERROR, debugINFO } from '../utils/debug';
+import { debugERROR } from '../utils/debug';
 import { createJWT } from '../utils/token';
 import { Avatar } from '../entities/Avatar.entity';
 
 export default {
-	patch: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
+	patch: async (req: JWTRequest, res: Response): Promise<void> => {
 		try {
 			const {
 				user,
@@ -17,7 +17,6 @@ export default {
 			if (user === undefined) {
 				throw Error('RequestError: user_id');
 			}
-			debugINFO('user: ', user);
 
 			// avatar_id가 DB에 존재하지 않을 경우
 			const avatar = await Avatar.findOne({ id: avatar_id });

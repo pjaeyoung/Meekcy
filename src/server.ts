@@ -1,9 +1,6 @@
-import app from './index';
+import server from './socket';
 import { debugHTTP } from './utils/debug';
-
 /* Server Activation */
-const server = app.listen(app.get('port'), () => {
-	debugHTTP(`server listening on PORT ${app.get('port')}`);
+server.listen(4000, () => {
+	debugHTTP('server listening on PORT 4000');
 });
-
-export default server;
