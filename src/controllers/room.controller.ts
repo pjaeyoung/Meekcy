@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { JWTRequest } from '../interfaces/Auth.interface';
-import { debugERROR, debugINFO } from '../utils/debug';
+import { debugERROR } from '../utils/debug';
 import { Room } from '../entities/Room.entity';
 
 export default {
