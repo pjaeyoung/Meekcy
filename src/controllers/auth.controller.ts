@@ -1,10 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client, LoginTicket, TokenPayload } from 'google-auth-library';
 import { User } from '../entities/User.entity';
 import { debugERROR } from '../utils/debug';
 import configs from '../common/config';
-import { JWTCreationOption } from '../interfaces/Auth.interface';
-import jwt from 'jsonwebtoken';
+import { createJWT } from '../utils/token';
 
 const client = new OAuth2Client();
 
@@ -23,15 +22,15 @@ const verifyTokenAndGetUserInfo = async (idToken: string): Promise<TokenPayload 
 	}
 };
 
-// JWT token 생성 : nickname, avatar, userId이 담겨짐
-const createJWT = (option: JWTCreationOption): string => {
-	return jwt.sign(option, configs.JWT_SECRET, { expiresIn: 129600 });
-};
-
 export default {
-	post: async (req: Request, res: Response): Promise<void> => {
-		const { id_token } = req.body;
+	post: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		try {
+			const { id_token } = req.body;
+
+			if (id_token === undefined) {
+				throw Error('RequestError');
+			}
+
 			// id_token 검증 및 유저 정보 가져오기
 			const payload = await verifyTokenAndGetUserInfo(id_token);
 			if (payload === undefined) {
@@ -45,19 +44,25 @@ export default {
 				defaults: { nickname: payload.name, snsId: payload.sub },
 			});
 
-			// token 생성
-			const token = createJWT({
-				userId: user.id,
+			const jwtPayload = {
+				id: user.id,
 				nickname: user.nickname,
 				avatar: user.avatar.url,
-			});
+			};
+
+			// token 생성
+			const token = createJWT({ payload: jwtPayload });
 
 			// 클라이언트에 token 전달
 			const statusCode = created ? 201 : 200;
 			res.status(statusCode).json({ token });
 		} catch (err) {
 			debugERROR(err);
-			res.status(404).send(err.message);
+			if (err.message === 'RequestError' || err.name === 'QueryFailedError') {
+				res.status(404).send('unvalid token_id');
+			} else {
+				next(err);
+			}
 		}
 	},
 };

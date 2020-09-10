@@ -1,19 +1,24 @@
 import { Request } from 'express';
 
-interface token {
+export interface Token {
 	avatar: string;
 	exp: number;
 	iat: number;
 	nickname: string;
-	userId: number;
+	id: number;
+}
+
+interface JWTCreationPayload {
+	nickname: string;
+	avatar: string;
+	id: number;
 }
 
 export interface JWTCreationOption {
-	nickname: string;
-	avatar: string;
-	userId: number;
+	payload: JWTCreationPayload;
+	expiresIn?: string;
 }
 
 export interface JWTRequest extends Request {
-	user?: token;
+	user?: Token;
 }

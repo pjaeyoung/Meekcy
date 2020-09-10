@@ -1,12 +1,13 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { User } from './User.entity';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class Avatar extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	@Column()
+	@Column({ select: false })
 	name!: string;
 
 	@Column()

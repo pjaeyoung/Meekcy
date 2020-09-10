@@ -8,11 +8,10 @@ import { createConnection } from 'typeorm';
 import expressJWT from 'express-jwt';
 import { debugHTTP, debugDB, debugERROR } from './utils/debug';
 import configs from './common/config';
-import { authRouter } from './routes/auth.route';
-import { avatarRouter } from './routes/avatar.route';
+import router from './routes/index.route';
 
 /* App Variables */
-createConnection(configs.NODE_ENV === 'test' ? 'test' : 'default')
+createConnection()
 	.then(() => {
 		debugDB('connection is success');
 	})
@@ -25,6 +24,8 @@ const corsOptions: cors.CorsOptions = {
 };
 const PORT: number = Number(process.env.PORT) || 4000;
 const app: express.Application = express();
+
+const { authRouter, avatarRouter, userRouter, videoRouter, roomRouter } = router;
 
 /* App Configuration */
 app.set('port', PORT);
@@ -42,6 +43,30 @@ app.use(
 		algorithms: ['HS256'],
 	}),
 	avatarRouter,
+);
+app.use(
+	'/user',
+	expressJWT({
+		secret: `${process.env.JWT_SECRET}`,
+		algorithms: ['HS256'],
+	}),
+	userRouter,
+);
+app.use(
+	'/videos',
+	expressJWT({
+		secret: `${process.env.JWT_SECRET}`,
+		algorithms: ['HS256'],
+	}),
+	videoRouter,
+);
+app.use(
+	'/rooms',
+	expressJWT({
+		secret: `${process.env.JWT_SECRET}`,
+		algorithms: ['HS256'],
+	}),
+	roomRouter,
 );
 
 // not found handling

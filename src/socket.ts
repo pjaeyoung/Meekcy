@@ -9,10 +9,9 @@ import { Room } from './entities/Room.entity';
 import { Avatar } from './entities/Avatar.entity';
 import configs from './common/config';
 import { joinUser, getCurrentUserid, leftUser, joinRoom } from './utils/socketUser';
-import { SocketUser, CustomRequest } from './interfaces/Socket.interface';
 import app from './index';
 import { debugINFO, debugERROR } from './utils/debug';
-import e, { response } from 'express';
+
 const server = http.createServer(app);
 const io = SocketIO(server);
 
@@ -23,16 +22,17 @@ io.use(
 	}),
 );
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
 	const socketToken: string = socket.request._query.token;
 	const decodedToken = jwt.verify(socketToken, configs.JWT_SECRET);
 	const [user, isExsist] = joinUser(
 		socket.id,
-		(<any>decodedToken).userId,
+		(<any>decodedToken).id,
 		(<any>decodedToken).nickname,
 		(<any>decodedToken).room,
 		(<any>decodedToken).avatar,
 	);
+
 	if (isExsist) {
 		socket.disconnect(true);
 		socket.emit('overlapUser', {});
@@ -47,59 +47,46 @@ io.on('connection', (socket) => {
 		//message db에 넣기
 		let message = new Message();
 		message.caption = `Joined ${user.username}`;
-		await User.findOne({ id: user.userId })
-			.then((res) => {
-				if (res) {
-					message.user = res;
-				} else {
-					return;
-				}
-			})
-			.then(() => {
-				Room.findOne({ roomname: user.room }).then((res) => {
-					console.log(res, 'roomname');
-					if (res) {
-						message.room = res;
-					} else {
-						return;
-					}
-					message.save();
-				});
-			});
-		await Room.findOne({ roomname: user.room }).then((res) => {
-			Message.find({ room: res }).then((response) => {
-				console.log(response, 'findMsg');
 
-				let messages = response.map((element) => {
-					return {
-						value: {
-							caption: element.caption,
-							message: element.text,
-							id: user.userId,
-							avatar: user.avatar,
-						},
-					};
-				});
-				io.to(user.room).emit('receiveHistoryMessages', messages);
-			});
+		let finduser = await User.findOne({ id: user.userId });
+		let findRoom = await Room.findOne({ roomname: user.room });
+		if (!finduser || !findRoom) {
+			debugINFO(!finduser);
+			return;
+		}
+		finduser.room = findRoom;
+		await finduser.save();
+		debugINFO(message, 'message!!');
 
-			// io.to(user.room).emit('receiveHistoryMessages',{})
+		message.user = finduser;
+		message.room = findRoom;
+		await message.save();
+
+		const msg = await Message.createQueryBuilder('message')
+			.leftJoinAndSelect('message.user', 'user')
+			.leftJoinAndSelect('user.avatar', 'avatar')
+			.leftJoin('message.room', 'room')
+			.where('room.roomname = :roomname', { roomname: user.room })
+			.getMany();
+
+		let messages = msg.map((element) => {
+			return {
+				value: {
+					caption: element.caption,
+					message: element.text,
+					id: element.user.id,
+					avatar: element.user.avatar.url,
+				},
+			};
 		});
-
-		// io.to(user.room).emit('receiveMessage', {
-		// 	value: {
-		// 		caption: message.caption,
-		// 		id: user.userId,
-		// 		avatar: user.avatar,
-		// 	},
-		// });
+		io.to(user.room).emit('receiveHistoryMessages', messages);
 	});
 
 	socket.on('error', (err) => {
 		debugERROR(err);
 	});
 
-	socket.on('sendMessage', (value) => {
+	socket.on('sendMessage', async (value) => {
 		console.log(value, 'send');
 
 		if (!user) {
@@ -107,7 +94,7 @@ io.on('connection', (socket) => {
 		}
 		let message = new Message();
 		message.text = value.message;
-		User.findOne({ id: user.userId })
+		await User.findOne({ id: user.userId })
 			.then((res) => {
 				if (res) {
 					message.user = res;
@@ -142,27 +129,17 @@ io.on('connection', (socket) => {
 			nickname: user.username,
 			avatar: value.user.avatar,
 		};
+
 		user.avatar = value.user.avatar;
-		await User.findOne({ id: user.userId }).then((res) => {
-			console.log(res, '!!!');
-			if (res) {
-				Avatar.findOne({ url: user.avatar }).then((response) => {
-					if (response) {
-						res.avatar = response;
-						res.save();
-					}
-				});
-			}
-		});
 
 		io.to(user.room).emit('receiveChangeAvatar', tempObj);
 	});
 
-	socket.on('disconnect', () => {
+	socket.on('disconnect', async () => {
 		let message = new Message();
 
 		message.caption = `left ${user.username}`;
-		User.findOne({ id: user.userId })
+		await User.findOne({ id: user.userId })
 			.then((res) => {
 				if (res) {
 					message.user = res;
@@ -188,12 +165,11 @@ io.on('connection', (socket) => {
 				avatar: user.avatar,
 			},
 		});
-		const curuser = getCurrentUserid(socket.id);
-		const tempRoomName = user.room;
+
 		const isExistParticipant = leftUser(user.userId, user.room);
-		// if (!isExistParticipant) {
-		// 	Room.delete({ roomname: tempRoomName });
-		// }
+		if (!isExistParticipant) {
+			await Room.delete({ roomname: user.room });
+		}
 	});
 });
 export default server;

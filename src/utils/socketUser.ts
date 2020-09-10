@@ -21,7 +21,6 @@ function joinUser(
 
 function getCurrentUserid(id: string): SocketUser | undefined {
 	const findUser: SocketUser | undefined = users.find((user: SocketUser) => id === user.socketId);
-	console.log(users, 'users');
 
 	return findUser;
 }

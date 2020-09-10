@@ -10,8 +10,9 @@ import {
 } from 'typeorm';
 import { User } from './User.entity';
 import { Room } from './Room.entity';
+import configs from '../common/config';
 
-@Entity()
+@Entity({ database: configs.DB_NAME })
 export class Message extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;
@@ -22,10 +23,10 @@ export class Message extends BaseEntity {
 	@Column({ nullable: true })
 	caption!: string;
 
-	@CreateDateColumn({ name: 'created_at' })
+	@CreateDateColumn({ name: 'created_at', select: false })
 	createdAt!: Date;
 
-	@UpdateDateColumn({ name: 'updated_at' })
+	@UpdateDateColumn({ name: 'updated_at', select: false })
 	updatedAt!: Date;
 
 	@ManyToOne((type) => User, (user) => user.messages, { nullable: false, onDelete: 'CASCADE' })
