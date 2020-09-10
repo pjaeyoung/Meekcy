@@ -45,8 +45,8 @@ export default {
 				throw Error('Unauthorized');
 			}
 			// Room 생성
-			const room = await Room.createAndSave({ videoId: video_id, user, end_time });
-			res.status(201).json(room);
+			const roomname = await Room.createAndSave({ videoId: video_id, user });
+			res.status(201).json({ roomname });
 		} catch (err) {
 			debugERROR(err);
 			res.status(404).send(err.message);
