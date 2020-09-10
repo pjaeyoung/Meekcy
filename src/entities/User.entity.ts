@@ -32,7 +32,7 @@ export class User extends BaseEntity {
 
 	@ManyToOne((type) => Room, (room) => room.users, { onDelete: 'SET NULL' })
 	@JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
-	room!: Room;
+	room!: Room | null;
 
 	@OneToMany((type) => Message, (message) => message.user)
 	messages!: Message[];
