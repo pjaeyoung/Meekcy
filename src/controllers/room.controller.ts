@@ -17,7 +17,7 @@ export default {
 			}
 
 			// roomname으로 Room정보 가져오기
-			const room = await Room.findByRoomname(roomname, user);
+			const room = await Room.findByRoomname(roomname);
 			res.json(room);
 		} catch (err) {
 			debugERROR(err);
