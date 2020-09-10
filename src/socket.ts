@@ -158,6 +158,14 @@ io.on('connection', async (socket) => {
 					message.save();
 				});
 			});
+		const userRecord = await User.findOne({ id: user.userId });
+		if (userRecord === undefined) {
+			throw Error('RequestError: user_id');
+		}
+
+		userRecord.room = null;
+		userRecord.save();
+
 		io.to(user.room).emit('receiveMessage', {
 			value: {
 				caption: message.caption,
