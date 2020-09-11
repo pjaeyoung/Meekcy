@@ -12,7 +12,6 @@ import { Message } from './Message.entity';
 import { Video } from './Video.entity';
 import configs from '../common/config';
 import { RoomCreateCondition, FoundRoom } from '../interfaces/Room.interface';
-import { Token } from '../interfaces/Auth.interface';
 
 @Entity({ database: configs.DB_NAME })
 export class Room extends BaseEntity {
@@ -60,30 +59,18 @@ export class Room extends BaseEntity {
 		return room.roomname;
 	};
 
-	static findByRoomname = async (roomname: string, userToken: Token): Promise<FoundRoom> => {
+	static findByRoomname = async (roomname: string): Promise<FoundRoom> => {
 		// roomname에 해당하는 video, message 정보 가져오기
-		const room = await Room.createQueryBuilder('room')
+		const room = await Video.createQueryBuilder('video')
+			.select(['video.title', 'video.url_720', 'video.url_480', 'video.url_360'])
+			.innerJoin('video.rooms', 'room')
 			.where('room.roomname = :roomname', { roomname })
-			.innerJoinAndSelect('room.video', 'video')
-			.leftJoinAndSelect('room.messages', 'message')
-			.leftJoinAndSelect('message.user', 'user')
-			.leftJoinAndSelect('user.avatar', 'avatar')
 			.getOne();
 
 		// roomname에 해당하는 record가 없다면 에러 처리
 		if (room === undefined) {
 			throw Error('RequestError: roomname');
 		}
-
-		// 응답으로 보낼 정보 형식 맞추기
-		const { iat, exp, ...user } = userToken;
-		const { video, messages } = room;
-		const reformattedRoom = {
-			video: { title: video.title, url: video.url },
-			user,
-			messages,
-		};
-
-		return reformattedRoom;
+		return room;
 	};
 }

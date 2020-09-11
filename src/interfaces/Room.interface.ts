@@ -1,12 +1,6 @@
 import { Token } from './Auth.interface';
 import { Message } from '../entities/Message.entity';
 
-interface VideoInRoom {
-	title: string;
-	url: string;
-	end_time?: number;
-}
-
 interface UserInRoom {
 	id?: number;
 	nickname: string;
@@ -19,7 +13,8 @@ export interface RoomCreateCondition {
 }
 
 export interface FoundRoom {
-	video: VideoInRoom;
-	user: UserInRoom;
-	messages: Message[];
+	title: string;
+	url_720: string;
+	url_480: string;
+	url_360: string;
 }

@@ -4,22 +4,38 @@ import { VideoHistory } from '../entities/VideoHistory.entity';
 import { Video } from '../entities/Video.entity';
 
 export default {
-	getAll: async (req: JWTRequest, res: Response, next: NextFunction) => {
+	getAll: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
 		try {
-			const videos = await Video.find();
+			const videos = await Video.find({
+				select: ['id', 'title', 'thumbnail', 'runningTime', 'releaseDay', 'detail', 'url_720'],
+			});
 			res.json(videos);
 		} catch (err) {
 			next(err);
 		}
 	},
-	getWatched: async (req: JWTRequest, res: Response, next: NextFunction) => {
+	getWatched: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
 		try {
 			const { user } = req;
+
+			if (user === undefined) {
+				throw Error('Unauthorized');
+			}
+
 			const videos = await VideoHistory.createQueryBuilder('history')
-				.select('history.endTime')
 				.innerJoin('history.user', 'user')
 				.innerJoinAndSelect('history.video', 'video')
-				.where('history.user_id = :userId', { userId: user?.id })
+				.where('history.user_id = :userId', { userId: user.id })
+				.select([
+					'history.endTime',
+					'video.id',
+					'video.title',
+					'video.thumbnail',
+					'video.runningTime',
+					'video.releaseDay',
+					'video.detail',
+					'video.url_720',
+				])
 				.getMany();
 			res.json(videos);
 		} catch (err) {
