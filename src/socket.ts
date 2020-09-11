@@ -37,7 +37,9 @@ io.on('connection', async (socket) => {
 		socket.disconnect(true);
 		socket.emit('overlapUser', {});
 	}
-
+	socket.on('testevent', (value: any) => {
+		console.log('############################', value);
+	});
 	socket.on('joinRoom', async (value) => {
 		joinRoom(user.userId, value.roomName);
 		socket.join(user.room);
@@ -135,8 +137,9 @@ io.on('connection', async (socket) => {
 		io.to(user.room).emit('receiveChangeAvatar', tempObj);
 	});
 
-	socket.on('disconnect', async () => {
+	socket.on('disconnect', async (value) => {
 		let message = new Message();
+		console.log('===========================>', value);
 
 		message.caption = `left ${user.username}`;
 		await User.findOne({ id: user.userId })
