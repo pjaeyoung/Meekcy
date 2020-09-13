@@ -24,13 +24,7 @@ export class Video extends BaseEntity {
 	detail!: string;
 
 	@Column()
-	url_720!: string;
-
-	@Column()
-	url_480!: string;
-
-	@Column()
-	url_360!: string;
+	url!: string;
 
 	@OneToMany((type) => Room, (room) => room.video)
 	rooms!: Room[];
