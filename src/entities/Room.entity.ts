@@ -62,7 +62,7 @@ export class Room extends BaseEntity {
 	static findByRoomname = async (roomname: string): Promise<FoundRoom> => {
 		// roomname에 해당하는 video, message 정보 가져오기
 		const room = await Video.createQueryBuilder('video')
-			.select(['video.title', 'video.url_720', 'video.url_480', 'video.url_360'])
+			.select(['video.title', 'video.url'])
 			.innerJoin('video.rooms', 'room')
 			.where('room.roomname = :roomname', { roomname })
 			.getOne();
