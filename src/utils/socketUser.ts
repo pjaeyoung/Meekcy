@@ -18,6 +18,15 @@ function joinUser(
 	}
 	return [user, isExist];
 }
+function getUserInRoom(roomname: string) {
+	let count = 0;
+	users.forEach((element) => {
+		if (element.room === roomname) {
+			count++;
+		}
+	});
+	return count;
+}
 
 function getCurrentUserid(id: string): SocketUser | undefined {
 	const findUser: SocketUser | undefined = users.find((user: SocketUser) => id === user.socketId);
@@ -27,10 +36,8 @@ function getCurrentUserid(id: string): SocketUser | undefined {
 
 function joinRoom(userId: number, roomName: string) {
 	const findUser = users.find((element) => element.userId === userId);
-	console.log('============');
 	if (findUser) {
 		findUser.room = roomName;
-		console.log(users, '=================');
 	} else {
 		console.log('not found user');
 	}
@@ -52,4 +59,4 @@ function leftUser(userId: number, roomName: string) {
 	return false;
 }
 
-export { joinUser, getCurrentUserid, leftUser, joinRoom };
+export { joinUser, getCurrentUserid, leftUser, joinRoom, getUserInRoom };

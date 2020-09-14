@@ -6,11 +6,14 @@ import jwt from 'jsonwebtoken';
 import { Message } from './entities/Message.entity';
 import { User } from './entities/User.entity';
 import { Room } from './entities/Room.entity';
+import { VideoHistory } from './entities/VideoHistory.entity';
 import { Avatar } from './entities/Avatar.entity';
 import configs from './common/config';
-import { joinUser, getCurrentUserid, leftUser, joinRoom } from './utils/socketUser';
+import { joinUser, getCurrentUserid, leftUser, joinRoom, getUserInRoom } from './utils/socketUser';
 import app from './index';
 import { debugINFO, debugERROR } from './utils/debug';
+import { Video } from './entities/Video.entity';
+import { getRepository } from 'typeorm';
 
 const server = http.createServer(app);
 const io = SocketIO(server);
@@ -79,7 +82,9 @@ io.on('connection', async (socket) => {
 				},
 			};
 		});
+		let countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveHistoryMessages', messages);
+		io.to(user.room).emit('receiveParticipants', { countParticipants });
 	});
 
 	socket.on('error', (err) => {
@@ -134,8 +139,25 @@ io.on('connection', async (socket) => {
 
 		io.to(user.room).emit('receiveChangeAvatar', tempObj);
 	});
+	socket.on('sendLastVideoCurrnetTime', async (value) => {
+		let videoHistory = new VideoHistory();
 
-	socket.on('disconnect', async () => {
+		let roomRepo = await getRepository(Room)
+			.createQueryBuilder('room')
+			.leftJoinAndSelect('room.video', 'video')
+			.where('room.video = video.id')
+			.getOne();
+
+		let findUser = await User.findOne({ id: user.userId });
+
+		if (findUser && roomRepo) {
+			videoHistory.user = findUser;
+			videoHistory.endTime = value.currentTime;
+			videoHistory.video = roomRepo.video;
+			await videoHistory.save();
+		}
+	});
+	socket.on('disconnect', async (value) => {
 		let message = new Message();
 
 		message.caption = `left ${user.username}`;
@@ -149,7 +171,6 @@ io.on('connection', async (socket) => {
 			})
 			.then(() => {
 				Room.findOne({ roomname: user.room }).then((res) => {
-					console.log(res, 'end');
 					if (res) {
 						message.room = res;
 					} else {
@@ -159,13 +180,13 @@ io.on('connection', async (socket) => {
 				});
 			});
 		const userRecord = await User.findOne({ id: user.userId });
+
 		if (userRecord === undefined) {
 			throw Error('RequestError: user_id');
 		}
 
 		userRecord.room = null;
-		userRecord.save();
-
+		await userRecord.save();
 		io.to(user.room).emit('receiveMessage', {
 			value: {
 				caption: message.caption,
@@ -173,8 +194,9 @@ io.on('connection', async (socket) => {
 				avatar: user.avatar,
 			},
 		});
-
 		const isExistParticipant = leftUser(user.userId, user.room);
+		let countParticipants = getUserInRoom(user.room);
+		io.to(user.room).emit('receiveParticipants', { countParticipants });
 		if (!isExistParticipant) {
 			await Room.delete({ roomname: user.room });
 		}
