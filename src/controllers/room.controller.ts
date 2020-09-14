@@ -28,16 +28,12 @@ export default {
 		try {
 			const {
 				user,
-				body: { video_id, end_time },
+				body: { video_id },
 			} = req;
 
 			// 클라이언트에서 잘못된 payload 보냈을 때 예외처리
 			if (video_id === undefined) {
 				throw Error('RequestError: video_id');
-			}
-
-			if (end_time === undefined) {
-				throw Error('RequestError: end_time');
 			}
 
 			// jwt 토큰에서 user 정보가 없을 경우 예외처리

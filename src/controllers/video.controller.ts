@@ -7,7 +7,7 @@ export default {
 	getAll: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
 		try {
 			const videos = await Video.find({
-				select: ['id', 'title', 'thumbnail', 'runningTime', 'releaseDay', 'detail', 'url_720'],
+				select: ['id', 'title', 'thumbnail', 'runningTime', 'releaseDay', 'detail', 'url'],
 			});
 			res.json(videos);
 		} catch (err) {
@@ -34,7 +34,7 @@ export default {
 					'video.runningTime',
 					'video.releaseDay',
 					'video.detail',
-					'video.url_720',
+					'video.url',
 				])
 				.getMany();
 			res.json(videos);
