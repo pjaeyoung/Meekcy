@@ -9,7 +9,7 @@ import { Room } from './entities/Room.entity';
 import { VideoHistory } from './entities/VideoHistory.entity';
 import { Avatar } from './entities/Avatar.entity';
 import configs from './common/config';
-import { joinUser, getCurrentUserid, leftUser, joinRoom } from './utils/socketUser';
+import { joinUser, getCurrentUserid, leftUser, joinRoom, getUserInRoom } from './utils/socketUser';
 import app from './index';
 import { debugINFO, debugERROR } from './utils/debug';
 import { Video } from './entities/Video.entity';
@@ -82,7 +82,9 @@ io.on('connection', async (socket) => {
 				},
 			};
 		});
+		let countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveHistoryMessages', messages);
+		io.to(user.room).emit('receiveParticipants', { countParticipants });
 	});
 
 	socket.on('error', (err) => {
@@ -192,8 +194,9 @@ io.on('connection', async (socket) => {
 				avatar: user.avatar,
 			},
 		});
-
 		const isExistParticipant = leftUser(user.userId, user.room);
+		let countParticipants = getUserInRoom(user.room);
+		io.to(user.room).emit('receiveParticipants', { countParticipants });
 		if (!isExistParticipant) {
 			await Room.delete({ roomname: user.room });
 		}

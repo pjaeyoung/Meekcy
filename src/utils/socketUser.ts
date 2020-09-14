@@ -18,6 +18,15 @@ function joinUser(
 	}
 	return [user, isExist];
 }
+function getUserInRoom(roomname: string) {
+	let count = 0;
+	users.forEach((element) => {
+		if (element.room === roomname) {
+			count++;
+		}
+	});
+	return count;
+}
 
 function getCurrentUserid(id: string): SocketUser | undefined {
 	const findUser: SocketUser | undefined = users.find((user: SocketUser) => id === user.socketId);
@@ -50,4 +59,4 @@ function leftUser(userId: number, roomName: string) {
 	return false;
 }
 
-export { joinUser, getCurrentUserid, leftUser, joinRoom };
+export { joinUser, getCurrentUserid, leftUser, joinRoom, getUserInRoom };
