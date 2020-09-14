@@ -6,11 +6,14 @@ import jwt from 'jsonwebtoken';
 import { Message } from './entities/Message.entity';
 import { User } from './entities/User.entity';
 import { Room } from './entities/Room.entity';
+import { VideoHistory } from './entities/VideoHistory.entity';
 import { Avatar } from './entities/Avatar.entity';
 import configs from './common/config';
 import { joinUser, getCurrentUserid, leftUser, joinRoom } from './utils/socketUser';
 import app from './index';
 import { debugINFO, debugERROR } from './utils/debug';
+import { Video } from './entities/Video.entity';
+import { getRepository } from 'typeorm';
 
 const server = http.createServer(app);
 const io = SocketIO(server);
@@ -37,9 +40,7 @@ io.on('connection', async (socket) => {
 		socket.disconnect(true);
 		socket.emit('overlapUser', {});
 	}
-	socket.on('testevent', (value: any) => {
-		console.log('############################', value);
-	});
+
 	socket.on('joinRoom', async (value) => {
 		joinRoom(user.userId, value.roomName);
 		socket.join(user.room);
@@ -136,10 +137,26 @@ io.on('connection', async (socket) => {
 
 		io.to(user.room).emit('receiveChangeAvatar', tempObj);
 	});
+	socket.on('sendLastVideoCurrnetTime', async (value) => {
+		let videoHistory = new VideoHistory();
 
+		let roomRepo = await getRepository(Room)
+			.createQueryBuilder('room')
+			.leftJoinAndSelect('room.video', 'video')
+			.where('room.video = video.id')
+			.getOne();
+
+		let findUser = await User.findOne({ id: user.userId });
+
+		if (findUser && roomRepo) {
+			videoHistory.user = findUser;
+			videoHistory.endTime = value.currentTime;
+			videoHistory.video = roomRepo.video;
+			await videoHistory.save();
+		}
+	});
 	socket.on('disconnect', async (value) => {
 		let message = new Message();
-		console.log('===========================>', value);
 
 		message.caption = `left ${user.username}`;
 		await User.findOne({ id: user.userId })
@@ -152,7 +169,6 @@ io.on('connection', async (socket) => {
 			})
 			.then(() => {
 				Room.findOne({ roomname: user.room }).then((res) => {
-					console.log(res, 'end');
 					if (res) {
 						message.room = res;
 					} else {
@@ -162,13 +178,13 @@ io.on('connection', async (socket) => {
 				});
 			});
 		const userRecord = await User.findOne({ id: user.userId });
+
 		if (userRecord === undefined) {
 			throw Error('RequestError: user_id');
 		}
 
 		userRecord.room = null;
-		userRecord.save();
-
+		await userRecord.save();
 		io.to(user.room).emit('receiveMessage', {
 			value: {
 				caption: message.caption,

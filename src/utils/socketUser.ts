@@ -27,10 +27,8 @@ function getCurrentUserid(id: string): SocketUser | undefined {
 
 function joinRoom(userId: number, roomName: string) {
 	const findUser = users.find((element) => element.userId === userId);
-	console.log('============');
 	if (findUser) {
 		findUser.room = roomName;
-		console.log(users, '=================');
 	} else {
 		console.log('not found user');
 	}
