@@ -1,20 +1,20 @@
-import { Response, NextFunction } from 'express';
+import { Response } from 'express';
 import { JWTRequest } from '../interfaces/Auth.interface';
 import { VideoHistory } from '../entities/VideoHistory.entity';
 import { Video } from '../entities/Video.entity';
 
 export default {
-	getAll: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
+	getAll: async (req: JWTRequest, res: Response): Promise<void> => {
 		try {
 			const videos = await Video.find({
 				select: ['id', 'title', 'thumbnail', 'runningTime', 'releaseDay', 'detail', 'url'],
 			});
 			res.json(videos);
 		} catch (err) {
-			next(err);
+			res.status(404).send(err.message);
 		}
 	},
-	getWatched: async (req: JWTRequest, res: Response, next: NextFunction): Promise<void> => {
+	getWatched: async (req: JWTRequest, res: Response): Promise<void> => {
 		try {
 			const { user } = req;
 
@@ -39,7 +39,7 @@ export default {
 				.getMany();
 			res.json(videos);
 		} catch (err) {
-			next(err);
+			res.status(404).send(err.message);
 		}
 	},
 };

@@ -3,6 +3,7 @@ import { authRouter } from './auth.route';
 import { avatarRouter } from './avatar.route';
 import { videoRouter } from './video.route';
 import { roomRouter } from './room.route';
+import { videoHistoryRouter } from './videoHistory.route';
 
 export default {
 	userRouter,
@@ -10,4 +11,5 @@ export default {
 	avatarRouter,
 	videoRouter,
 	roomRouter,
+	videoHistoryRouter,
 };
