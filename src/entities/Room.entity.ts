@@ -38,10 +38,16 @@ export class Room extends BaseEntity {
 		const { user, videoId } = condition;
 		const room = new Room();
 		// DB에 유저 정보 확인
-		const userRecord = await User.findOne({ id: user.id });
+		const userRecord = await User.findOne({ id: user.id }, { relations: ['room'] });
 		if (userRecord === undefined) {
 			throw Error('RequestError: user_id');
 		}
+
+		// 유저가 room에 있을 때 room 생성 막기
+		if (userRecord.room !== null) {
+			throw Error('already exists in room');
+		}
+
 		// DB에 video 정보 확인
 		const videoRecord = await Video.findOne({ id: videoId });
 		if (videoRecord === undefined) {

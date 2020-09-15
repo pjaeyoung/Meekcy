@@ -111,6 +111,18 @@ describe('Room API Test', () => {
 					})
 					.catch((err) => done(err));
 			});
+			it('이미 room에 들어가있는 경우 NOT FOUND 응답을 해야 합니다.', (done) => {
+				chai
+					.request(URL)
+					.post('/rooms')
+					.set({ Authorization: `Bearer ${global.token}` })
+					.send({ video_id: 1 })
+					.then((res) => {
+						expect(res).to.have.status(404);
+						expect(res.text).to.equal('already exists in room');
+						done();
+					});
+			});
 		});
 	});
 });
