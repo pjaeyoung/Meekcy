@@ -11,7 +11,6 @@ import { User } from './User.entity';
 import { Video } from './Video.entity';
 import configs from '../common/config';
 import { VideoHistoryOption } from '../interfaces/Video.interface';
-import { debugINFO } from '../utils/debug';
 
 @Entity({ database: configs.DB_NAME })
 export class VideoHistory extends BaseEntity {
@@ -41,13 +40,22 @@ export class VideoHistory extends BaseEntity {
 			throw Error('RequestError: video_id');
 		}
 
+		// 기존 비디오 시청기록이 있는 경우, endTime 도달률 계산
+		const reach = Math.ceil((endTime / video.runningTime) * 100);
+
 		// 기존에 비디오 시청 기록 있는 지 확인
 		const videoHistory = await VideoHistory.createQueryBuilder('videoHistory')
 			.innerJoin('videoHistory.user', 'user')
-			.innerJoin('videoHistory.video', 'video')
+			.innerJoinAndSelect('videoHistory.video', 'video')
 			.where('user.id = :userId', { userId })
 			.andWhere('video.id = :videoId', { videoId })
 			.getOne();
+
+		// 95% 시청하면 삭제 및 함수 종료
+		if (reach >= 95) {
+			videoHistory && (await VideoHistory.remove(videoHistory));
+			return;
+		}
 
 		// 기존에 비디오 시청 기록이 없으면 새로 생성하기
 		if (videoHistory === undefined) {
@@ -57,7 +65,7 @@ export class VideoHistory extends BaseEntity {
 				.values({ user: () => `${userId}`, video: () => `${videoId}`, endTime })
 				.execute();
 		} else {
-			// 기존 비디오 시청기록이 있는 경우 업데이트
+			// 기존에 비디오 시청 기록이 있으면 업데이트
 			videoHistory.endTime = endTime;
 			await videoHistory.save();
 		}

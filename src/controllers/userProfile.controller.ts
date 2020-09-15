@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import { Response } from 'express';
 import { JWTRequest, JWTCreationOption } from '../interfaces/Auth.interface';
 import { User } from '../entities/User.entity';
 import { debugERROR } from '../utils/debug';
