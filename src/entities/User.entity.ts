@@ -13,7 +13,6 @@ import { Message } from './Message.entity';
 import { VideoHistory } from './VideoHistory.entity';
 import { FindUserCondition } from '../interfaces/User.interface';
 import configs from '../common/config';
-import { debugINFO } from '../utils/debug';
 
 @Entity({ database: configs.DB_NAME })
 export class User extends BaseEntity {

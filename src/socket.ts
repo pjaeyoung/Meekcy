@@ -7,12 +7,10 @@ import { Message } from './entities/Message.entity';
 import { User } from './entities/User.entity';
 import { Room } from './entities/Room.entity';
 import { VideoHistory } from './entities/VideoHistory.entity';
-import { Avatar } from './entities/Avatar.entity';
 import configs from './common/config';
-import { joinUser, getCurrentUserid, leftUser, joinRoom, getUserInRoom } from './utils/socketUser';
+import { joinUser, leftUser, joinRoom, getUserInRoom } from './utils/socketUser';
 import app from './index';
 import { debugINFO, debugERROR } from './utils/debug';
-import { Video } from './entities/Video.entity';
 import { getRepository } from 'typeorm';
 
 const server = http.createServer(app);
@@ -28,7 +26,7 @@ io.use(
 io.on('connection', async (socket) => {
 	const socketToken: string = socket.request._query.token;
 	const decodedToken = jwt.verify(socketToken, configs.JWT_SECRET);
-	const [user, isExsist] = joinUser(
+	const [user, isExist] = joinUser(
 		socket.id,
 		(<any>decodedToken).id,
 		(<any>decodedToken).nickname,
@@ -36,7 +34,7 @@ io.on('connection', async (socket) => {
 		(<any>decodedToken).avatar,
 	);
 
-	if (isExsist) {
+	if (isExist) {
 		socket.emit('overlapUser', { 1: 1 });
 		socket.disconnect(true);
 	}
@@ -48,11 +46,11 @@ io.on('connection', async (socket) => {
 			return;
 		}
 		//message db에 넣기
-		let message = new Message();
+		const message = new Message();
 		message.caption = `Joined ${user.username}`;
 
-		let finduser = await User.findOne({ id: user.userId });
-		let findRoom = await Room.findOne({ roomname: user.room });
+		const finduser = await User.findOne({ id: user.userId });
+		const findRoom = await Room.findOne({ roomname: user.room });
 		if (!finduser || !findRoom) {
 			debugINFO(!finduser);
 			return;
@@ -72,7 +70,7 @@ io.on('connection', async (socket) => {
 			.where('room.roomname = :roomname', { roomname: user.room })
 			.getMany();
 
-		let messages = msg.map((element) => {
+		const messages = msg.map((element) => {
 			return {
 				value: {
 					caption: element.caption,
@@ -83,7 +81,7 @@ io.on('connection', async (socket) => {
 				},
 			};
 		});
-		let countParticipants = getUserInRoom(user.room);
+		const countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveHistoryMessages', messages);
 		io.to(user.room).emit('receiveParticipants', { countParticipants });
 	});
@@ -96,7 +94,7 @@ io.on('connection', async (socket) => {
 		if (!user) {
 			return;
 		}
-		let message = new Message();
+		const message = new Message();
 		let nickname = '';
 		message.text = value.message;
 		await User.findOne({ id: user.userId })
@@ -142,15 +140,15 @@ io.on('connection', async (socket) => {
 		io.to(user.room).emit('receiveChangeAvatar', tempObj);
 	});
 	socket.on('sendLastVideoCurrnetTime', async (value) => {
-		let videoHistory = new VideoHistory();
+		const videoHistory = new VideoHistory();
 
-		let roomRepo = await getRepository(Room)
+		const roomRepo = await getRepository(Room)
 			.createQueryBuilder('room')
 			.leftJoinAndSelect('room.video', 'video')
 			.where('room.video = video.id')
 			.getOne();
 
-		let findUser = await User.findOne({ id: user.userId });
+		const findUser = await User.findOne({ id: user.userId });
 
 		if (findUser && roomRepo) {
 			videoHistory.user = findUser;
@@ -159,8 +157,8 @@ io.on('connection', async (socket) => {
 			await videoHistory.save();
 		}
 	});
-	socket.on('disconnect', async (value) => {
-		let message = new Message();
+	socket.on('disconnect', async () => {
+		const message = new Message();
 
 		message.caption = `left ${user.username}`;
 		await User.findOne({ id: user.userId })
@@ -197,7 +195,7 @@ io.on('connection', async (socket) => {
 			},
 		});
 		const isExistParticipant = leftUser(user.userId, user.room);
-		let countParticipants = getUserInRoom(user.room);
+		const countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveParticipants', { countParticipants });
 		if (!isExistParticipant) {
 			await Room.delete({ roomname: user.room });

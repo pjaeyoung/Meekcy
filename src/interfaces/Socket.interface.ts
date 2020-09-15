@@ -6,14 +6,8 @@ export interface SocketUser {
 	avatar: string;
 }
 
-import { Request, Response } from 'express';
+import { Request } from 'express';
 
 export interface CustomRequest extends Request {
 	decoded: string;
 }
-
-// export interface SocketToken {
-// 	userId?: string;
-// 	nickname: string;
-// 	avartar: string;
-// }
