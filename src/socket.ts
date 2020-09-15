@@ -37,8 +37,8 @@ io.on('connection', async (socket) => {
 	);
 
 	if (isExsist) {
+		socket.emit('overlapUser', { 1: 1 });
 		socket.disconnect(true);
-		socket.emit('overlapUser', {});
 	}
 
 	socket.on('joinRoom', async (value) => {
@@ -79,6 +79,7 @@ io.on('connection', async (socket) => {
 					message: element.text,
 					id: element.user.id,
 					avatar: element.user.avatar.url,
+					nickname: element.user.nickname,
 				},
 			};
 		});
@@ -92,17 +93,17 @@ io.on('connection', async (socket) => {
 	});
 
 	socket.on('sendMessage', async (value) => {
-		console.log(value, 'send');
-
 		if (!user) {
 			return;
 		}
 		let message = new Message();
+		let nickname = '';
 		message.text = value.message;
 		await User.findOne({ id: user.userId })
 			.then((res) => {
 				if (res) {
 					message.user = res;
+					nickname = res.nickname;
 				} else {
 					return;
 				}
@@ -124,6 +125,7 @@ io.on('connection', async (socket) => {
 				message: value.message,
 				id: user.userId,
 				avatar: user.avatar,
+				nickname: nickname,
 			},
 		});
 	});
