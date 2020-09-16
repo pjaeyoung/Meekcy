@@ -6,9 +6,7 @@ import { Video } from '../entities/Video.entity';
 export default {
 	getAll: async (req: JWTRequest, res: Response): Promise<void> => {
 		try {
-			const videos = await Video.find({
-				select: ['id', 'title', 'thumbnail', 'runningTime', 'releaseDay', 'detail', 'url'],
-			});
+			const videos = await Video.find();
 			res.json(videos);
 		} catch (err) {
 			res.status(404).send(err.message);
@@ -35,6 +33,7 @@ export default {
 					'video.releaseDay',
 					'video.detail',
 					'video.url',
+					'video.trailer',
 				])
 				.getMany();
 			res.json(videos);
