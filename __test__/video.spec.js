@@ -27,6 +27,7 @@ describe('Video API test', () => {
 								'releaseDay',
 								'detail',
 								'url',
+								'trailer',
 							]);
 						}
 						done();
@@ -69,6 +70,7 @@ describe('Video API test', () => {
 								'releaseDay',
 								'detail',
 								'url',
+								'trailer',
 							]);
 						}
 						done();
