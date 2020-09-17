@@ -164,7 +164,7 @@ io.on('connection', async (socket) => {
 		}
 	});
 	// url로 들어온 사람만 현재 비디오 재생시간 이벤트 트리거
-	socket.on('sendCurrentVideoPostion', (value) => {
+	socket.on('sendCurrentVideoPosition', (value) => {
 		socket
 			.to(value.target)
 			.emit('receiveSeeked', { currentTime: value.currentTime + 0.7, status: value.status });
