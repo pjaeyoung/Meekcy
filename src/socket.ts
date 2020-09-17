@@ -45,6 +45,7 @@ io.on('connection', async (socket) => {
 		if (!user.room) {
 			return;
 		}
+
 		//message db에 넣기
 		const message = new Message();
 		message.caption = `Joined ${user.username}`;
@@ -157,7 +158,19 @@ io.on('connection', async (socket) => {
 			await videoHistory.save();
 		}
 	});
+	socket.on('sendChangePlay', async (value) => {
+		socket.to(user.room).broadcast.emit('receivePlay', value);
+	});
+	socket.on('sendChangeSeeked', async (value) => {
+		socket.to(user.room).broadcast.emit('receiveSeeked', value);
+	});
+	socket.on('sendChangePause', async (value) => {
+		socket.to(user.room).broadcast.emit('receivePause', value);
+	});
+
 	socket.on('disconnect', async () => {
+		console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+
 		const message = new Message();
 
 		message.caption = `left ${user.username}`;
