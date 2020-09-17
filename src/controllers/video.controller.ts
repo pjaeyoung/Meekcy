@@ -24,17 +24,7 @@ export default {
 				.innerJoin('history.user', 'user')
 				.innerJoinAndSelect('history.video', 'video')
 				.where('history.user_id = :userId', { userId: user.id })
-				.select([
-					'history.endTime',
-					'video.id',
-					'video.title',
-					'video.thumbnail',
-					'video.runningTime',
-					'video.releaseDay',
-					'video.detail',
-					'video.url',
-					'video.trailer',
-				])
+				.select(['history.endTime', 'video'])
 				.getMany();
 			res.json(videos);
 		} catch (err) {
