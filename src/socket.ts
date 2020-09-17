@@ -171,12 +171,84 @@ io.on('connection', async (socket) => {
 	});
 
 	socket.on('sendChangePlay', async (value) => {
+		if (!user) {
+			return;
+		}
+		const message = new Message();
+		const finduser = await User.findOne({ id: user.userId });
+		const findRoom = await Room.findOne({ roomname: user.room });
+		if (!finduser || !findRoom) {
+			return;
+		}
+		message.caption = `started playing the video`;
+		message.user = finduser;
+		message.room = findRoom;
+		await message.save();
+		io.to(user.room).emit('receiveMessage', {
+			value: {
+				caption: message.caption,
+				id: user.userId,
+				avatar: user.avatar,
+				nickname: user.username,
+			},
+		});
 		socket.to(user.room).broadcast.emit('receivePlay', value);
 	});
 	socket.on('sendChangeSeeked', async (value) => {
+		if (!user) {
+			return;
+		}
+		const beforeSec: number = value.currentTime;
+
+		let hour: number | string = Math.floor(beforeSec / 3600);
+		let min: number | string = Math.floor((beforeSec % 3600) / 60);
+		let sec: number | string = Math.floor(beforeSec % 60);
+		const message = new Message();
+		const finduser = await User.findOne({ id: user.userId });
+		const findRoom = await Room.findOne({ roomname: user.room });
+		if (!finduser || !findRoom) {
+			return;
+		}
+		hour < 10 ? (hour = '0' + hour) : '';
+		min < 10 ? (min = '0' + min) : '';
+		sec < 10 ? (sec = '0' + sec) : '';
+
+		message.caption = `Jump to ${hour}:${min}:${sec}`;
+		message.user = finduser;
+		message.room = findRoom;
+		await message.save();
+		io.to(user.room).emit('receiveMessage', {
+			value: {
+				caption: message.caption,
+				id: user.userId,
+				avatar: user.avatar,
+				nickname: user.username,
+			},
+		});
 		socket.to(user.room).broadcast.emit('receiveSeeked', value);
 	});
 	socket.on('sendChangePause', async (value) => {
+		if (!user) {
+			return;
+		}
+		const message = new Message();
+		const finduser = await User.findOne({ id: user.userId });
+		const findRoom = await Room.findOne({ roomname: user.room });
+		if (!finduser || !findRoom) {
+			return;
+		}
+		message.caption = `paused the video`;
+		message.user = finduser;
+		message.room = findRoom;
+		await message.save();
+		io.to(user.room).emit('receiveMessage', {
+			value: {
+				caption: message.caption,
+				id: user.userId,
+				avatar: user.avatar,
+				nickname: user.username,
+			},
+		});
 		socket.to(user.room).broadcast.emit('receivePause', value);
 	});
 
