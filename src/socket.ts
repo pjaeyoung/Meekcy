@@ -53,12 +53,10 @@ io.on('connection', async (socket) => {
 		const finduser = await User.findOne({ id: user.userId });
 		const findRoom = await Room.findOne({ roomname: user.room });
 		if (!finduser || !findRoom) {
-			debugINFO(!finduser);
 			return;
 		}
 		finduser.room = findRoom;
 		await finduser.save();
-		debugINFO(message, 'message!!');
 
 		message.user = finduser;
 		message.room = findRoom;
@@ -85,6 +83,13 @@ io.on('connection', async (socket) => {
 		const countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveHistoryMessages', messages);
 		io.to(user.room).emit('receiveParticipants', { countParticipants });
+
+		// url로 스트리밍화면 진입한 사람에게 현재 video 시간을 알려주는 트리거 역할
+		io.in(user.room).clients((err: Error, clients: any) => {
+			// 여기서 clients 중 하나 골라서 <동영상 위치> 이벤트를 송신(emit)
+			debugINFO('clients ==== >', clients);
+			io.to(clients[0]).emit('currentVideoPosition', { target: user.socketId });
+		});
 	});
 
 	socket.on('error', (err) => {
@@ -158,6 +163,13 @@ io.on('connection', async (socket) => {
 			await videoHistory.save();
 		}
 	});
+	// url로 들어온 사람만 현재 비디오 재생시간 이벤트 트리거
+	socket.on('sendCurrentVideoPostion', (value) => {
+		socket
+			.to(value.target)
+			.emit('receiveSeeked', { currentTime: value.currentTime + 0.7, status: value.status });
+	});
+
 	socket.on('sendChangePlay', async (value) => {
 		socket.to(user.room).broadcast.emit('receivePlay', value);
 	});
@@ -169,8 +181,6 @@ io.on('connection', async (socket) => {
 	});
 
 	socket.on('disconnect', async () => {
-		console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-
 		const message = new Message();
 
 		message.caption = `left ${user.username}`;
