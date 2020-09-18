@@ -34,6 +34,9 @@ export class Room extends BaseEntity {
 	@JoinColumn({ name: 'video_id' })
 	video!: Video;
 
+	/*
+	 	@Description   유저가 Room에 존재하는지 판단 후 Room record 를 생성하는 함수 
+	*/
 	static createAndSave = async (condition: RoomCreateCondition): Promise<string> => {
 		const { user, videoId } = condition;
 		const room = new Room();
@@ -65,6 +68,9 @@ export class Room extends BaseEntity {
 		return room.roomname;
 	};
 
+	/*
+	 	@Description   roomname에 해당하는 비디오 정보와 채팅내역을 반환하는 함수 
+	*/
 	static findByRoomname = async (roomname: string): Promise<FoundRoom> => {
 		// roomname에 해당하는 video, message 정보 가져오기
 		const room = await Video.createQueryBuilder('video')

@@ -7,13 +7,17 @@ import { createJWT } from '../utils/token';
 
 const client = new OAuth2Client();
 
-// token 검증 및 user정보 반환
+/*
+  @Description    token 검증 및 user정보 반환
+*/
 const verifyTokenAndGetUserInfo = async (idToken: string): Promise<TokenPayload | undefined> => {
 	try {
+		// client로 부터 받은 idToken과 구글 클라이언트 아이디로 token 검증 및 token decode
 		const ticket: LoginTicket = await client.verifyIdToken({
 			idToken,
 			audience: configs.GOOGLE_CLIENT_ID,
 		});
+		// decode된 것 중 payload만 반환
 		return ticket.getPayload();
 	} catch (err) {
 		const error = new Error(err.message);
