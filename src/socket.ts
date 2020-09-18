@@ -87,7 +87,7 @@ io.on('connection', async (socket) => {
 		// url로 스트리밍화면 진입한 사람에게 현재 video 시간을 알려주는 트리거 역할
 		io.in(user.room).clients((err: Error, clients: any) => {
 			// 여기서 clients 중 하나 골라서 <동영상 위치> 이벤트를 송신(emit)
-			debugINFO('clients ==== >', clients);
+			// url 진입한 대상(target)만 이벤트를 걸어주기 위해 socketId 전달 : 서버 => 클라이언트 => 서버로 전달되는 값 (166줄 참고)
 			io.to(clients[0]).emit('currentVideoPosition', { target: user.socketId });
 		});
 	});
@@ -163,7 +163,9 @@ io.on('connection', async (socket) => {
 			await videoHistory.save();
 		}
 	});
-	// url로 들어온 사람만 현재 비디오 재생시간 이벤트 트리거
+	// 임의로 선택된 client로 부터 currentTime(비디오 재생시간)과 status(비디오 재생상태)를 받아
+	// url로 스트리밍화면에 진입한 유저에게만 receiveSeeked 이벤트 발동
+	// 싱크 문제로 currentTime에 0.7초 더해준 값 전달
 	socket.on('sendCurrentVideoPosition', (value) => {
 		socket
 			.to(value.target)
@@ -180,7 +182,7 @@ io.on('connection', async (socket) => {
 		if (!finduser || !findRoom) {
 			return;
 		}
-		message.caption = `started playing the video`;
+		message.caption = 'started playing the video';
 		message.user = finduser;
 		message.room = findRoom;
 		await message.save();
@@ -237,7 +239,7 @@ io.on('connection', async (socket) => {
 		if (!finduser || !findRoom) {
 			return;
 		}
-		message.caption = `paused the video`;
+		message.caption = 'paused the video';
 		message.user = finduser;
 		message.room = findRoom;
 		await message.save();

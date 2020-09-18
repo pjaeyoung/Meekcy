@@ -11,6 +11,8 @@ import configs from './common/config';
 import router from './routes/index.route';
 
 /* App Variables */
+
+// mysql과 연결
 createConnection()
 	.then(() => {
 		debugDB('connection is success');
@@ -43,6 +45,8 @@ app.use(cors(corsOptions));
 
 app.use('/auth', authRouter);
 
+// client에서 요청 헤더 Authorization에 입력한 token값을 decode하여 request에 user 프로퍼티로 할당해주는 미들웨어
+// 이 미들웨어를 거치고 나면 각 라우트에서 request.user 형태로 token값을 접근할 수 있다.
 const jwtMiddleware = expressJWT({
 	secret: `${process.env.JWT_SECRET}`,
 	algorithms: ['HS256'],
