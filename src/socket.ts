@@ -16,6 +16,7 @@ import { getRepository } from 'typeorm';
 const server = http.createServer(app);
 const io = SocketIO(server);
 
+//socket jwt 토큰 통신을 위한 미들웨어
 io.use(
 	socketioJwt.authorize({
 		secret: configs.JWT_SECRET,
@@ -23,7 +24,19 @@ io.use(
 	}),
 );
 
+// socket통신 간의 이벤트 관리
+/**
+ * 이벤트
+ * commection : socket통신이 연결 됐을경우 자동으로 socket.io에서 발생하는 이벤트
+ * joinRoom : client에서 특정 방에 들어가면 처리하는 flow가 담긴 이벤트
+ * sendMessage : client에서 보내온 message를 처리하는 이벤트
+ * sendChangeAvatar : client에서 변경된 avatar을 실시간으로 모든 유저에게 변경된 내용을 보내주기위한 이벤트
+ * sendChangePlay , sendChangeSeeked , sendChangePause : client에서 보내준 싱크를 맞추기 위한 이벤트
+ * disconnect : socket 연결이 끊어졌을때 자동으로 socket.io에서 발생하는 이벤트
+ *
+ * */
 io.on('connection', async (socket) => {
+	//토큰 파싱과 파싱된 data로 in memory로 참여자들을 관리하기위한 구문
 	const socketToken: string = socket.request._query.token;
 	const decodedToken = jwt.verify(socketToken, configs.JWT_SECRET);
 	const [user, isExist] = joinUser(
@@ -33,9 +46,9 @@ io.on('connection', async (socket) => {
 		(<any>decodedToken).room,
 		(<any>decodedToken).avatar,
 	);
-
+	//이미 in memory(paticipant array)에 존재하는 경우 client에게 알리는 구문
 	if (isExist) {
-		socket.emit('overlapUser', { 1: 1 });
+		socket.emit('overlapUser', {});
 		socket.disconnect(true);
 	}
 
@@ -45,8 +58,7 @@ io.on('connection', async (socket) => {
 		if (!user.room) {
 			return;
 		}
-
-		//message db에 넣기
+		//message db row Create
 		const message = new Message();
 		message.caption = `Joined ${user.username}`;
 
@@ -82,6 +94,7 @@ io.on('connection', async (socket) => {
 				},
 			};
 		});
+		//현재 방에 접속된 참여자들의 수를 보내주고, 저장된 메세지들을 보내주는 트리거
 		const countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveHistoryMessages', messages);
 		io.to(user.room).emit('receiveParticipants', { countParticipants });
@@ -95,6 +108,7 @@ io.on('connection', async (socket) => {
 		if (!user) {
 			return;
 		}
+		//message db row Create
 		const message = new Message();
 		let nickname = '';
 		message.text = value.message;
@@ -135,33 +149,16 @@ io.on('connection', async (socket) => {
 			nickname: user.username,
 			avatar: value.user.avatar,
 		};
-
 		user.avatar = value.user.avatar;
 
 		io.to(user.room).emit('receiveChangeAvatar', tempObj);
 	});
-	socket.on('sendLastVideoCurrnetTime', async (value) => {
-		const videoHistory = new VideoHistory();
 
-		const roomRepo = await getRepository(Room)
-			.createQueryBuilder('room')
-			.leftJoinAndSelect('room.video', 'video')
-			.where('room.video = video.id')
-			.getOne();
-
-		const findUser = await User.findOne({ id: user.userId });
-
-		if (findUser && roomRepo) {
-			videoHistory.user = findUser;
-			videoHistory.endTime = value.currentTime;
-			videoHistory.video = roomRepo.video;
-			await videoHistory.save();
-		}
-	});
 	socket.on('sendChangePlay', async (value) => {
 		if (!user) {
 			return;
 		}
+		//message db row Create
 		const message = new Message();
 		const finduser = await User.findOne({ id: user.userId });
 		const findRoom = await Room.findOne({ roomname: user.room });
@@ -186,6 +183,7 @@ io.on('connection', async (socket) => {
 		if (!user) {
 			return;
 		}
+		//message db row Create
 		const beforeSec: number = value.currentTime;
 
 		let hour: number | string = Math.floor(beforeSec / 3600);
@@ -197,9 +195,9 @@ io.on('connection', async (socket) => {
 		if (!finduser || !findRoom) {
 			return;
 		}
-		hour < 10 ? (hour = '0' + hour) : '';
-		min < 10 ? (min = '0' + min) : '';
-		sec < 10 ? (sec = '0' + sec) : '';
+		hour = hour < 10 ? (hour = '0' + hour) : hour;
+		min = min < 10 ? (min = '0' + min) : min;
+		sec = sec < 10 ? (sec = '0' + sec) : sec;
 
 		message.caption = `Jump to ${hour}:${min}:${sec}`;
 		message.user = finduser;
@@ -219,6 +217,7 @@ io.on('connection', async (socket) => {
 		if (!user) {
 			return;
 		}
+		//message db row Create
 		const message = new Message();
 		const finduser = await User.findOne({ id: user.userId });
 		const findRoom = await Room.findOne({ roomname: user.room });
@@ -241,10 +240,8 @@ io.on('connection', async (socket) => {
 	});
 
 	socket.on('disconnect', async () => {
-		console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-
 		const message = new Message();
-
+		//message db row Create
 		message.caption = `left ${user.username}`;
 		await User.findOne({ id: user.userId })
 			.then((res) => {
@@ -264,6 +261,7 @@ io.on('connection', async (socket) => {
 					message.save();
 				});
 			});
+		//방을 나간 유저의 db에서 room_id를 삭제 하기위한 구문
 		const userRecord = await User.findOne({ id: user.userId });
 
 		if (userRecord === undefined) {
@@ -279,6 +277,7 @@ io.on('connection', async (socket) => {
 				avatar: user.avatar,
 			},
 		});
+		//해당 유저를 in memory에서 삭제하고 해당방에 아무도 남아있지 않을경우 해당 room을 db delete
 		const isExistParticipant = leftUser(user.userId, user.room);
 		const countParticipants = getUserInRoom(user.room);
 		io.to(user.room).emit('receiveParticipants', { countParticipants });
