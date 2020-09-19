@@ -31,6 +31,9 @@ export class VideoHistory extends BaseEntity {
 	@JoinColumn({ name: 'video_id' })
 	video!: Video;
 
+	/*
+	 	@Description  95% 시청한 경우를 제외한 비디오 시청기록 record를 생성하는 함수  
+	*/
 	static UpdateOrCreate = async (option: VideoHistoryOption): Promise<void> => {
 		const { videoId, userId, endTime } = option;
 

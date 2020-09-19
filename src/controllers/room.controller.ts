@@ -11,7 +11,7 @@ export default {
 				params: { roomname },
 			} = req;
 
-			// user undefined 예외처리
+			// jwt 토큰에서 user 정보가 없을 경우 예외처리
 			if (user === undefined) {
 				throw Error('Unauthorized');
 			}
