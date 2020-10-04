@@ -52,13 +52,13 @@
   
 ![___](https://user-images.githubusercontent.com/47022167/95015442-ea870180-0687-11eb-8268-7db317f0658f.gif)
 ![Peek 2020-10-04 21-26](https://user-images.githubusercontent.com/47022167/95015518-4e112f00-0688-11eb-889b-5e3adb899d95.gif)
-![Peek 2020-10-04 21-32](https://user-images.githubusercontent.com/47022167/95015666-19ea3e00-0689-11eb-8308-6db8dcc6ac52.gif)
   
 </details>
 <details>
 <summary>Chatting</summary>
   
 ![1](https://user-images.githubusercontent.com/47022167/95015469-0b4f5700-0688-11eb-91cc-c474481c32ea.gif)
+![Peek 2020-10-04 21-32](https://user-images.githubusercontent.com/47022167/95015666-19ea3e00-0689-11eb-8308-6db8dcc6ac52.gif)
 
   
 </details>
